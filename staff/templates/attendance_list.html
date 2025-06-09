@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card container mt-5">
+  <h2 class="m-2">Attendance Records</h2>
+
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th>Staff Name</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Time In</th>
+        <th>Date Out</th>
+        <th>Time Out</th>
+        <th>Remarks</th>
+        <th>Actions</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in attendance %}
+      <tr>
+        <td>{{ record.staff.first_name }} {{ record.staff.last_name }}</td>
+        <td>{{ record.date }}</td>
+        <td>{{ record.status }}</td>
+        <td>{{ record.time_in }}</td>
+        <td>{{ record.date_out }}</td>
+        <td>{{ record.time_out }}</td>
+        <td>{{ record.remarks }}</td>
+        <td>
+          {% if record.status == 'Present' and not record.time_out %}
+          <a href="{% url 'checkout_attendance' record.id %}" class="btn btn-warning">Checkout</a>
+          {% else %}
+          <p class="badge text-bg-success">Already Checkedout</p>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-center">No attendance records available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

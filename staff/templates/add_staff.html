@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet" />
+<style>
+  body {
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  }
+  
+  .card {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(79, 70, 229, 0.2);
+  }
+  
+  .card-header {
+    background-color: #4f46e5;
+    color: white;
+    border-bottom: none;
+    padding: 1.5rem;
+    position: relative;
+  }
+  
+  .card-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #4f46e5, #818cf8);
+  }
+  
+  .card-header h5 {
+    font-weight: 600;
+    margin-bottom: 0;
+    font-size: 1.25rem;
+  }
+  
+  .card-body {
+    padding: 2rem;
+  }
+  
+  /* Form styling */
+  form p {
+    margin-bottom: 1.5rem;
+  }
+  
+  form label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: #374151;
+  }
+  
+  form input, form select, form textarea {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    background-color: #f9fafb;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  form input:focus, form select:focus, form textarea:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
+    outline: none;
+  }
+  
+  .form-help-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+  }
+  
+  .btn-primary {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #4338ca;
+    border-color: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  
+  .alert-danger {
+    background-color: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #b91c1c;
+    border-radius: 8px;
+    padding: 1.25rem;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(185, 28, 28, 0.1);
+  }
+  
+  /* Form field error styling */
+  .errorlist {
+    list-style: none;
+    padding-left: 0;
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  /* Animation */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .alert {
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  /* Title icon */
+  .title-icon {
+    margin-right: 0.5rem;
+  }
+  
+  /* Custom spinner */
+  .spinner-border.text-light {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if user.profile.role != 'admin' and user.profile.role != 'manager' %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Access Denied:</strong> You do not have permission to access this page. Please contact your administrator.
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <i class="bi bi-person-plus-fill title-icon"></i>
+          <h5 class="mb-0">Add New Staff Member</h5>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} mb-4" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+          
+          <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+              <div class="mb-4">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-help-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="errorlist">
+                    {% for error in field.errors %}
+                      <div>{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+            
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <a href="{% url 'staff_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to List
+              </a>
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="bi bi-person-plus me-1"></i> Add Staff Member
+                <span class="spinner-border text-light ms-1 d-none" role="status" id="loadingSpinner">
+                  <span class="visually-hidden">Loading...</span>
+                </span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Form validation and submission handling
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form.needs-validation');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    if (form) {
+      form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        } else {
+          // Show loading spinner
+          submitBtn.disabled = true;
+          loadingSpinner.classList.remove('d-none');
+        }
+        
+        form.classList.add('was-validated');
+      });
+    }
+    
+    // Apply Bootstrap form styling to Django form fields
+    const formInputs = document.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+      input.classList.add('form-control');
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

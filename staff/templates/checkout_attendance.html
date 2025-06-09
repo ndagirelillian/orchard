@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if user.profile.role != 'admin' and user.profile.role != 'manager' %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-octagon-fill me-2"></i>
+        You do not have permission to access this page.
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container mt-4">
+  <div class="card border-primary">
+    <div class="card-header  text-white">
+      <h3 class="card-title mb-0">
+        <i class="bi bi-box-arrow-right me-2"></i>
+        Staff Checkout - {{ attendance.staff.get_full_name }}
+      </h3>
+    </div>
+    
+    <div class="card-body">
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        Current date and time are pre-filled. Adjust as needed.
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="date_out" class="form-label fw-bold">Checkout Date</label>
+            <input type="date" class="form-control" 
+                   name="date_out" id="date_out" 
+                   value="{% now 'Y-m-d' %}" required
+                   min="{{ attendance.date|date:'Y-m-d' }}"
+                   max="{% now 'Y-m-d' %}">
+            <div class="form-text">Must be between check-in date ({{ attendance.date|date:"M d, Y" }}) and today</div>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="time_out" class="form-label fw-bold">Checkout Time</label>
+            <input type="time" class="form-control" 
+                   name="time_out" id="time_out" 
+                   value="{% now 'H:i' %}" required>
+            <div class="form-text">Using 24-hour format</div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <a href="{% url 'attendance_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-1"></i> Confirm Checkout
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="card-footer bg-light">
+      <small class="text-muted">
+        <i class="bi bi-clock-history me-1"></i>
+        Checked in: {{ attendance.date|date:"M d, Y" }} at {{ attendance.time_in|time:"H:i" }}
+      </small>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .card {
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+</style>
+{% endblock %}

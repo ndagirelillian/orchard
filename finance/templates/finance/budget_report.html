@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Budget vs Actual Report - {{ month }}/{{ year }}</h2>
+  {% if budget %}
+    <table class="table table-bordered mt-3">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Budgeted</th>
+          <th>Actual</th>
+          <th>Variance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in comparison %}
+        <tr>
+          <td>{{ item.category }}</td>
+          <td>Ugx {{ item.budgeted|floatformat:2 }}</td>
+          <td>Ugx {{ item.actual|floatformat:2 }}</td>
+          <td>Ugx {{ item.variance|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No budget found for this period.</p>
+  {% endif %}
+</div>
+{% endblock %}

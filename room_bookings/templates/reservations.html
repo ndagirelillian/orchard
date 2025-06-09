@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Card styling */
+    .card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.5rem 1.5rem 0.75rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Title and actions styling */
+    .page-title {
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #212529;
+    }
+
+    .page-subtitle {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filters-wrapper {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    /* Button styling */
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    .btn-primary:hover {
+        background-color: #3a56d5;
+        border-color: #3a56d5;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.15);
+    }
+
+    .btn-outline-secondary {
+        color: #495057;
+        border-color: #dee2e6;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #212529;
+        border-color: #dee2e6;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    /* Table styling */
+    .table-container {
+        border-radius: 12px;
+        overflow: auto;
+        border: 1px solid #e9ecef;
+        margin-bottom: 1.5rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        font-size: 0.925rem;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        border-bottom: 2px solid #e9ecef;
+        padding: 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .table tr:hover {
+        background-color: rgba(67, 97, 238, 0.03);
+    }
+
+    /* Status badge styling */
+    .badge {
+        padding: 0.5rem 0.85rem;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .badge-confirmed {
+        background-color: rgba(40, 199, 111, 0.1);
+        color: #28c76f;
+    }
+
+    .badge-pending {
+        background-color: rgba(253, 126, 20, 0.1);
+        color: #fd7e14;
+    }
+
+    .badge-cancelled {
+        background-color: rgba(234, 84, 85, 0.1);
+        color: #ea5455;
+    }
+
+    .badge-checked-in {
+        background-color: rgba(67, 97, 238, 0.1);
+        color: #4361ee;
+    }
+
+    .badge-checked-out {
+        background-color: rgba(47, 143, 157, 0.1);
+        color: #2f8f9d;
+    }
+
+    /* Form controls styling */
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #dee2e6;
+        font-size: 0.95rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.15);
+    }
+
+    .search-control {
+        position: relative;
+        min-width: 200px;
+    }
+
+    .search-control .form-control {
+        padding-left: 2.5rem;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    /* Pagination styling */
+    .pagination {
+        margin-top: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .page-link {
+        border-radius: 6px;
+        margin: 0 0.15rem;
+        color: #4361ee;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .page-item.active .page-link {
+        background-color: #4361ee;
+        border-color: #4361ee;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-message {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+
+    .empty-state-description {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Customer info styling */
+    .customer-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .customer-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .filters-wrapper {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .header-actions {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .filters-wrapper {
+            width: 100%;
+        }
+
+        .search-control {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h4 class="page-title">Reservations</h4>
+        <p class="page-subtitle">Manage all room bookings and customer reservations</p>
+    </div>
+
+    <div class="card-body">
+        <div class="header-actions">
+            <a href="/room_bookings/add-reservation/" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Make Reservation
+            </a>
+
+            <div class="filters-wrapper">
+                <div class="search-control" style="width: 30%;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control" placeholder="Search reservations..." id="reservationSearch">
+                </div>
+
+                <select style="width: 30%;" class="form-select" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Checked-in">Checked-in</option>
+                    <option value="Checked-out">Checked-out</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+
+                <button class="btn btn-outline-secondary" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+        </div>
+        <div class="table-container"></div>
+        <table class="table table-striped" style="font-size: 0.85rem;">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Room</th>
+                    <th>Customer</th>
+                    <th>Check-in Date</th>
+                    <th>Total Nights</th>
+                    <th>Status</th>
+                    <th>Reservation Date</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations_list %}
+                <tr class="reservation-row" data-status="{{ reservation.status }}">
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="fw-medium">Room {{ reservation.room.room_number }}</span></td>
+                    <td>{{ reservation.customer }}</td>
+                    <td>{{ reservation.check_in_date }}</td>
+                    <td>{{ reservation.total_nights }}</td>
+                    <td>
+                        {% if reservation.status == 'Confirmed' %}
+                        <span class="badge badge-confirmed"><i class="fas fa-check-circle"></i> 
+                            {{ reservation.status}}</span>
+                        {% elif reservation.status == 'Pending' %}
+                        <span class="badge badge-pending"><i class="fas fa-clock"></i> {{ reservation.status }}</span>
+                        {% elif reservation.status == 'Cancelled' %}
+                        <span class="badge badge-cancelled"><i class="fas fa-times-circle"></i> 
+                            {{ reservation.status}}</span>
+                        {% elif reservation.status == 'Checked-In' %}
+                        <span class="badge badge-checked-in"><i class="fas fa-door-open"></i> 
+                            {{ reservation.status }}</span>
+                        {% elif reservation.status == 'Checked-Out' %}
+                        <span class="badge badge-checked-out"><i class="fas fa-door-closed"></i> 
+                            {{ reservation.status }}</span>
+                        {% else %}
+                        <span class="badge badge-secondary"><i class="fas fa-question-circle"></i> 
+                            {{ reservation.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ reservation.reservation_date }}</td>
+                    <td class="text-center">
+                        <a href="/room_bookings/reservations/{{ reservation.id }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                            data-bs-target="#statusModal" data-id="{{ reservation.id }}"
+                            data-status="{{ reservation.status }}">
+                            <i class="fas fa-edit"></i> Update Status
+                        </button>
+
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-alt empty-state-icon"></i>
+                            <h5 class="empty-state-message">No Reservations Found</h5>
+                            <p class="empty-state-description">There are currently no reservations in the system.
+                            </p>
+                            <a href="/room_bookings/add-reservation/" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i> Make First Reservation
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if reservations_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1" aria-label="First">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ reservations_list.previous_page_number }}" aria-label="Previous">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for page_num in reservations_list.paginator.page_range %}
+            {% if page_num >= reservations_list.number|add:-2 and page_num <= reservations_list.number|add:2 %} <li
+                class="page-item {% if page_num == reservations_list.number %}active{% endif %}">
+                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+                {% elif page_num == 1 or page_num == reservations_list.paginator.num_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+                {% elif page_num == reservations_list.number|add:-3 or page_num == reservations_list.number|add:3 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if reservations_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ reservations_list.next_page_number }}" aria-label="Next">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ reservations_list.paginator.num_pages }}" aria-label="Last">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="statusForm" method="POST">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel">Update Reservation Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="reservationIdInput" name="reservation_id">
+                    <label for="statusSelect" class="form-label">Select Status</label>
+                    <select name="status" id="statusSelect" class="form-select" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Checked-In">Checked-In</option>
+                        <option value="Checked-Out">Checked-Out</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const statusModal = document.getElementById('statusModal');
+        const statusForm = document.getElementById('statusForm');
+        const statusSelect = document.getElementById('statusSelect');
+        const reservationIdInput = document.getElementById('reservationIdInput');
+
+        statusModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const reservationId = button.getAttribute('data-id');
+            const currentStatus = button.getAttribute('data-status');
+
+            reservationIdInput.value = reservationId;
+            statusSelect.value = currentStatus;
+        });
+
+        statusForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const reservationId = reservationIdInput.value;
+            const selectedStatus = statusSelect.value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`/room_bookings/reservations/${reservationId}/update-status/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ status: selectedStatus })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        const modal = bootstrap.Modal.getInstance(statusModal);
+                        modal.hide();
+                        location.reload();
+                    } else {
+                        alert("Failed to update status.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred.");
+                });
+        });
+    });
+</script>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Search functionality
+        const searchInput = document.getElementById('reservationSearch');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function () {
+                const searchText = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.reservation-row');
+
+                rows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    if (rowText.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Status filter functionality
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.addEventListener('change', function () {
+                const selectedStatus = this.value;
+                const rows = document.querySelectorAll('.reservation-row');
+
+                rows.forEach(row => {
+                    if (!selectedStatus || row.dataset.status === selectedStatus) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Refresh button
+        const refreshBtn = document.getElementById('refreshBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function () {
+                location.reload();
+            });
+        }
+    });
+</script>
+{% endblock content %}

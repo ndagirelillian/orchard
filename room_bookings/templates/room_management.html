@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Room Management</h2>
+
+    <div class="row">
+        <!-- Room Type Form -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Add Room Type</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ room_type_form.as_p }}
+                        <button type="submit" name="add_room_type" class="btn btn-primary">Add Room Type</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Form -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Add Room</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ room_form.as_p }}
+                        <button type="submit" name="add_room" class="btn btn-primary">Add Room</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display Existing Data -->
+    <div class="row mt-4">
+        <!-- Room Types List -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Existing Room Types</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for room_type in room_types %}
+                        <li class="list-group-item">
+                            {{ room_type.name }} - Ugx {{ room_type.base_price }}
+                            {% if room_type.room_image %}
+                            <img src="{{ room_type.room_image.url }}" alt="{{ room_type.name }}" class="img-thumbnail"
+                                width="100">
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No room types added yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rooms List -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-default text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Existing Rooms</h4>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success btn-sm" id="view-all">All</button>
+                        <button type="button" class="btn btn-success btn-sm" id="view-available">Available</button>
+                        <button type="button" class="btn btn-success btn-sm" id="view-occupied">Occupied</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Search by room number or type..."
+                            id="room-search">
+                        <button class="btn btn-outline-primary" type="button" id="search-button">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                    <ul class="list-group room-list">
+                        {% for room in rooms %}
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center room-item {% if not room.is_available %}occupied{% endif %}">
+                            <div>
+                                <strong>{{ room.room_number }}</strong> - {{ room.room_type.name }}
+                                <div class="small text-muted">
+                                    Floor {{ room.floor }} | Capacity: {{ room.capacity }}
+                                    {% if room.price_per_night %}| {{ room.price_per_night }} per night{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <span
+                                    class="badge rounded-pill {% if room.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if room.is_available %}Available{% else %}Occupied{% endif %}
+                                </span>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-center">No rooms added yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>Total: {{ rooms|length }} room(s) | Available: {{ rooms|selectattr('is_available', 'equalto',
+                        True)|list|length }}</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Details Modal -->
+        <div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="roomDetailsModalLabel">Room Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="roomDetailsContent">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <a href="#" id="reserveRoomBtn" class="btn btn-primary">Make Reservation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- JavaScript for room filtering and search -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Filter buttons
+        document.getElementById('view-all').addEventListener('click', function () {
+            showAllRooms();
+        });
+
+        document.getElementById('view-available').addEventListener('click', function () {
+            filterRooms('occupied', true);
+        });
+
+        document.getElementById('view-occupied').addEventListener('click', function () {
+            filterRooms('occupied', false);
+        });
+
+        // Search functionality
+        document.getElementById('search-button').addEventListener('click', searchRooms);
+        document.getElementById('room-search').addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                searchRooms();
+            }
+        });
+
+        // Room details modal
+        document.querySelectorAll('.view-room-details').forEach(button => {
+            button.addEventListener('click', function (e) {
+                e.preventDefault();
+                const roomId = this.getAttribute('data-room-id');
+                openRoomDetailsModal(roomId);
+            });
+        });
+
+        function showAllRooms() {
+            document.querySelectorAll('.room-item').forEach(room => {
+                room.style.display = 'flex';
+            });
+        }
+
+        function filterRooms(className, hide) {
+            document.querySelectorAll('.room-item').forEach(room => {
+                if (room.classList.contains(className)) {
+                    room.style.display = hide ? 'none' : 'flex';
+                } else {
+                    room.style.display = hide ? 'flex' : 'none';
+                }
+            });
+        }
+
+        function searchRooms() {
+            const searchTerm = document.getElementById('room-search').value.toLowerCase();
+            document.querySelectorAll('.room-item').forEach(room => {
+                const roomText = room.textContent.toLowerCase();
+                if (roomText.includes(searchTerm)) {
+                    room.style.display = 'flex';
+                } else {
+                    room.style.display = 'none';
+                }
+            });
+        }
+
+        function openRoomDetailsModal(roomId) {
+            // This function would typically make an AJAX call to get room details
+            // For now, we'll just show a placeholder modal
+            const modal = new bootstrap.Modal(document.getElementById('roomDetailsModal'));
+            document.getElementById('reserveRoomBtn').href = `/add_reservation/?room_id=${roomId}`;
+            modal.show();
+
+            // In a real implementation, you would fetch room details:
+            /*
+            fetch(`/get_room_details/${roomId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('roomDetailsContent').innerHTML = buildRoomDetailsHTML(data);
+                    modal.show();
+                });
+            */
+        }
+    });
+</script>
+{% endblock %}

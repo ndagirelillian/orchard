@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>
+                {% if object %}
+                    <iconify-icon icon="lucide:user-cog"></iconify-icon> Edit User
+                {% else %}
+                    <iconify-icon icon="lucide:user-plus"></iconify-icon> Create User
+                {% endif %}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Username & Role -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">User Role</label>
+                        {{ profile_form.role }}
+                        {{ profile_form.role.errors }}
+                    </div>
+                </div>
+
+                <!-- Password Fields (Only show on create) -->
+                {% if not object %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Password</label>
+                        {{ form.password1 }}
+                        {{ form.password1.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Confirm Password</label>
+                        {{ form.password2 }}
+                        {{ form.password2.errors }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Other Fields -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mt-4">
+                            <div class="form-check form-switch">
+                                {{ form.is_staff }}
+                                <label class="form-check-label">Staff Status</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'user-list' %}" class="btn btn-secondary">
+                        <iconify-icon icon="lucide:arrow-left"></iconify-icon> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if object %}
+                            <iconify-icon icon="lucide:save"></iconify-icon> Update User
+                        {% else %}
+                            <iconify-icon icon="lucide:user-plus"></iconify-icon> Create User
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!-- specials section -->
+{% load static %}
+<section class="w3l-portfolio-8 py-5">
+    <div class="portfolio-main py-md-5 py-4">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-md-8">
+                    <div class="section-heading mb-sm-5 mb-4">
+                        <h3 class="title-style mb-2">Our Specials</h3>
+                        <p class="lead">
+                            Delightful small bites and lighter fare to begin your meal experience.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row galler-top">
+
+
+                {% for item in dishes %}
+                <div class="col-md-4 col-sm-6 protfolio-item hover14 mt-4">
+                    <a href="#" data-lightbox="example-set" data-title="Magazine Content Writing">
+                        <figure>
+                           {% if item.image_url %}
+                                <img src="{{ item.image_url.url }}" alt="product" class="img-fluid" style="height: 250px; object-fit: cover; width: 100%;">
+                            {% else %}
+                                <p>No image available</p>
+                            {% endif %}
+
+
+                            <div class="p-4">
+                                <p>Orchards</p>
+                                <p class="fw-bold" style="white-space: normal; word-wrap: break-word; color: #000; font-size: 12px;">{{ item.name }}</p>
+                            </div>
+                        </figure>
+                    </a>
+                </div>
+                {% endfor %}
+
+            </div>
+            <div class="text-center">
+                <a href="menu.html" class="btn btn-style-white btn-style-primary mt-lg-5 mt-2">See Our Menu</a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //specials section -->

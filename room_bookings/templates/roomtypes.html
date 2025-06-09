@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <h4 class="fw-semibold mb-4">Rooms</h4>
+            <p>All for your confort.</p>
+            {% for item in rooms %}
+            <div class="col-md-4">
+                <a href="/rooms/{{item.id}}">
+                    <div class="card mb-3">
+                        <img src="{{item.room_image.url}}" class="card-img-top" alt="..."
+                            style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{item.name}}</h5>
+                            <p class="card-text">{{item.description}}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

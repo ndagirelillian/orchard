@@ -1,0 +1,90 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+<div class="card" id="receipt">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div>
+                            <h3 class="text-center mb-4">{{ setting.hotel_name | default:"Orchard Motel" }}</h3>
+                            <div class="row">
+                                <div class="col">{{ setting.phone_number | default:"" }}</div>
+                                <div class="col">{{ setting.email | default:"" }}</div>
+                            </div>
+                        </div>
+                        <h5 class="text-center mb-4">Reservation Receipt</h5>
+                        <p><strong class="text-bold">Receipt Number: </strong> <span id="receipt_number">{{ reservation.random_id }}</span></p>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <h6>Customer:</h6>
+                                <p id="customer_name">{{ reservation.customer.name }}</p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <h6>Reservation Date:</h6>
+                                <p id="reservation_date">{{ reservation.reservation_date }}</p>
+                            </div>
+                        </div>
+
+                        <h6>Reservation Details</h6>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Room</th>
+                                    <th>Total Nights</th>
+                                    <th>Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="room_number">{{ reservation.room.room_number }}</td>
+                                    <td id="total_nights">{{ reservation.total_nights }}</td>
+                                    <td id="total_price">{{ reservation.total_price }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <h6>Check-In Date:</h6>
+                                <p id="check_in_date">{{ reservation.check_in_date }}</p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <h6>Check-Out Date:</h6>
+                                <p id="check_out_date">{{ reservation.check_out_date }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <h6>Status:</h6>
+                                <p id="status">{{ reservation.status }}</p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <h6>Special Requests:</h6>
+                                <p id="special_requests">{{ reservation.special_requests|default:"None" }}</p>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="text-center">
+                            <p><strong>Thank you for staying with us!</strong></p>
+                            <p><em>Created by: <span id="created_by">{{ reservation.created_by.username }}</span></em></p>
+                        </div>
+
+                        <!-- PDF Generation Button -->
+                        <div class="text-center mt-4">
+                            <a href="/reservation/{{reservation.id}}/pdf/" class="btn btn-primary">
+                                Generate PDF Receipt
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

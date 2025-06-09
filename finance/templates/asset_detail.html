@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="card container mt-5">
+  <h2 class="m-2">Asset Details</h2>
+
+  <table class="table table-bordered mt-4">
+    <tr>
+      <th>Name</th>
+      <td>{{ asset.name }}</td>
+    </tr>
+    <tr>
+      <th>Original Value</th>
+      <td>Ugx Shs. {{ asset.value|intcomma }}</td>
+    </tr>
+    <tr>
+      <th>Purchase Date</th>
+      <td>{{ asset.purchase_date }}</td>
+    </tr>
+    <tr>
+      <th>Useful Life (Years)</th>
+      <td>{{ asset.life_years }}</td>
+    </tr>
+    <tr>
+      <th>Depreciation per Year</th>
+      <td>Ugx Shs. {{ depreciation_per_year|floatformat:2|intcomma }}</td>
+    </tr>
+    <tr>
+      <th>Total Depreciation</th>
+      <td>Ugx Shs. {{ total_depreciation|floatformat:2|intcomma }}</td>
+    </tr>
+    <tr>
+      <th>Current Value</th>
+      <td>Ugx Shs. {{ current_value|floatformat:2|intcomma }}</td>
+    </tr>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4" id="receipt-container">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-xl-8">
+      <!-- Receipt Card -->
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden" id="receipt">
+        <!-- Header Section -->
+        <div class="card-header bg-primary bg-opacity-10 border-0 pt-4 pb-2 px-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            {% if setting.logo %}
+            <img src="{{ setting.logo }}" alt="{{ setting.hotel_name }}" class="brand-logo">
+            {% else %}
+            <div class="brand-text">
+              <h1 class="h3 fw-bold text-primary mb-0">{{ setting.hotel_name|default:"Merry Kerry Suites" }}</h1>
+              {% if setting.tagline %}
+              <p class="text-muted small mb-0">{{ setting.tagline }}</p>
+              {% endif %}
+            </div>
+            {% endif %}
+            <div class="text-end">
+              <div class="badge bg-success rounded-pill fs-6">
+                {{reservation.status}}
+              </div>
+              <div class="text-muted small mt-1">#{{ reservation.reservation_id }}</div>
+            </div>
+          </div>
+
+          <div class="border-top pt-3">
+            <div class="row g-2">
+              {% if setting.phone_number %}
+              <div class="col-auto">
+                <i class="bi bi-telephone me-1"></i>{{ setting.phone_number }}
+              </div>
+              {% endif %}
+              {% if setting.email %}
+              <div class="col-auto">
+                <i class="bi bi-envelope me-1"></i>{{ setting.email }}
+              </div>
+              {% endif %}
+              {% if setting.address %}
+              <div class="col-12">
+                <i class="bi bi-geo-alt me-1"></i>{{ setting.address }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body p-4">
+          <!-- Guest & Reservation Info -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="info-card">
+                <h6 class="info-card-title"><i class="bi bi-person me-2"></i>Guest Information</h6>
+                <dl class="info-card-list">
+                  <dt>Name</dt>
+                  <dd>{{ reservation.customer|default:"-" }}</dd>
+                  <dt>Email</dt>
+                  <dd>{{ reservation.email|default:"-" }}</dd>
+                  <dt>Phone</dt>
+                  <dd>{{ reservation.phone_number|default:"-" }}</dd>
+                </dl>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="info-card">
+                <h6 class="info-card-title"><i class="bi bi-calendar-event me-2"></i>Reservation Dates</h6>
+                <dl class="info-card-list">
+                  <dt>Check-in</dt>
+                  <dd>{{ reservation.check_in_date }} <small class="text-muted">After 2:00 PM</small></dd>
+                  <dt>Check-out</dt>
+                  <dd>{{ reservation.check_out_date }} <small class="text-muted">Before 11:00 AM</small></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accommodation Details -->
+          <div class="detail-card mb-4">
+            <h5 class="detail-card-header">
+              <i class="bi bi-door-closed me-2"></i>Accommodation Details
+            </h5>
+            <div class="detail-card-body">
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th>Room</th>
+                      <th>Type</th>
+                      <th class="text-end">Rate/Night</th>
+                      <th class="text-center">Nights</th>
+                      <th class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>#{{ reservation.room.room_number }}</td>
+                      <td>{{ reservation.room.room_type|default:"Standard" }}</td>
+                      <td class="text-end">{{ reservation.room.price_per_night|default:"Ush 0.00" }}</td>
+                      <td class="text-center">{{ reservation.total_nights }}</td>
+                      <td class="text-end fw-bold">{{ reservation.total_price|default:"Ush 0.00" }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Special Requests -->
+          {% if reservation.special_requests %}
+          <div class="alert alert-primary mb-4">
+            <h6 class="alert-heading mb-2"><i class="bi bi-megaphone me-2"></i>Special Requests</h6>
+            <p class="mb-0">{{ reservation.special_requests }}</p>
+          </div>
+          {% endif %}
+
+          <!-- Policies -->
+          <div class="policy-card mb-4">
+            <h6 class="policy-card-title"><i class="bi bi-info-circle me-2"></i>Cancellation Policy</h6>
+            <p class="policy-text">Free cancellation up to 24 hours before check-in. Late cancellations may incur a fee
+              up to one night's stay.</p>
+          </div>
+
+          <!-- Footer -->
+          <div class="thank-you text-center py-4 border-top">
+            <h5 class="text-primary mb-2">Thank You for Choosing Us!</h5>
+            <p class="text-muted small mb-0">Safe travels and see you soon!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons no-print mt-4">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button onclick="printReceiptDiv()" class="btn btn-primary no-print">Print Receipt</button>
+
+          <a href="/reservations/" class="btn btn-light">
+            <i class="bi bi-arrow-left me-2"></i>Back
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function printReceiptDiv() {
+    var receiptContent = document.getElementById("receipt").innerHTML;
+    var printWindow = window.open("", "", "height=600,width=800");
+    printWindow.document.write('<html><head><title>Print Receipt</title>');
+    printWindow.document.write('<style>');
+    printWindow.document.write('@media print { body { font-family: Arial; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 5px; } .no-print { display: none; } }');
+    printWindow.document.write('</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(receiptContent);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }
+</script>
+{% endblock %}

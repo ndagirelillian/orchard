@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Reuse styles from menu management */
+    .card, .table, .badge, .btn, .filter-row, 
+    .filter-dropdown, .active-filters, .empty-state {
+        /* Keep existing styles from previous templates */
+    }
+    
+    /* Category-specific status badges */
+    .badge-active {
+        background-color: rgba(56, 176, 0, 0.1);
+        color: #38b000;
+    }
+    
+    .badge-archived {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+    
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+        .table td, .table th {
+            padding: 0.5rem;
+        }
+        
+        .btn {
+            margin-bottom: 0.3rem;
+        }
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Category Management</h4>
+        <p class="text-muted small mb-0">Organize menu categories and groupings</p>
+    </div>
+
+    <div class="card-body">
+        <!-- Controls Section -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <div>
+                <a href="/data/categories/add/" class="btn btn-primary">
+                    <i class="fas fa-layer-group"></i> New Category
+                </a>
+                <button class="btn btn-outline-secondary" id="toggleFilters">
+                    <i class="fas fa-filter"></i> Filters
+                </button>
+            </div>
+            <div class="search-box mt-2 mt-md-0">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search categories...">
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filter-row" id="filterSection" style="display: none;">
+            <div class="filter-dropdown">
+                <label>Grouping</label>
+                <select class="form-select" id="groupFilter">
+                    <option value="">All Groupings</option>
+                    {% for value, name in category_groupings %}
+                    <option value="{{ value }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-dropdown">
+                <label>Status</label>
+                <select class="form-select" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="archived">Archived</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div class="active-filters mb-3" id="activeFilters" style="display: none;">
+            <!-- Dynamically populated filters -->
+            <button class="btn btn-sm btn-outline-secondary" onclick="clearAllFilters()">
+                Clear All
+            </button>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="table-responsive">
+            <table class="table" id="categoriesTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Grouping</th>
+                        <th>Description</th>
+                        <th>Items</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in object_list %}
+                    <tr class="category-row"
+                        data-name="{{ category.name|lower }}"
+                        data-group="{{ category.grouping }}"
+                        data-status="{{ category.is_active|yesno:'active,archived' }}"
+                        data-desc="{{ category.description|lower }}">
+                        <td>{{ category.name }}</td>
+                        <td>{{ category.get_grouping_display }}</td>
+                        <td>{{ category.description|truncatechars:30 }}</td>
+                        <td>{{ category.menu_items.count }}</td>
+                        <td>
+                            <span class="badge {% if category.is_active %}badge-active{% else %}badge-archived{% endif %}">
+                                {% if category.is_active %}Active{% else %}Archived{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/data/categories/{{ category.id }}/edit/"
+                               class="btn btn-sm btn-outline-primary">
+                               Edit
+                            </a>
+                    
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <p class="text-muted">No categories found</p>
+                            <a href="" class="btn btn-primary">
+                                Create First Category
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Previous</a>
+                </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="categoryName"></strong>?</p>
+                <p class="text-danger small">This will remove all associated menu items!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter Elements
+    const searchInput = document.getElementById('searchInput');
+    const groupFilter = document.getElementById('groupFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const rows = document.querySelectorAll('.category-row');
+    
+    // Filter State
+    let currentFilters = {
+        search: '',
+        group: '',
+        status: ''
+    };
+
+    // Filter Functions
+    function applyFilters() {
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const matchesSearch = row.dataset.name.includes(currentFilters.search) || 
+                                row.dataset.desc.includes(currentFilters.search);
+            const matchesGroup = !currentFilters.group || row.dataset.group === currentFilters.group;
+            const matchesStatus = !currentFilters.status || row.dataset.status === currentFilters.status;
+            
+            const shouldShow = matchesSearch && matchesGroup && matchesStatus;
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) visibleCount++;
+        });
+        
+        document.getElementById('categoriesTable').style.display = visibleCount ? '' : 'none';
+        document.getElementById('noResults').style.display = visibleCount ? 'none' : 'block';
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', function() {
+        currentFilters.search = this.value.trim().toLowerCase();
+        applyFilters();
+    });
+
+    groupFilter.addEventListener('change', function() {
+        currentFilters.group = this.value;
+        applyFilters();
+    });
+
+    statusFilter.addEventListener('change', function() {
+        currentFilters.status = this.value;
+        applyFilters();
+    });
+
+    // Toggle Filters
+    document.getElementById('toggleFilters').addEventListener('click', function() {
+        const filterSection = document.getElementById('filterSection');
+        filterSection.style.display = filterSection.style.display === 'none' ? 'flex' : 'none';
+        this.querySelector('i').className = filterSection.style.display === 'none' ? 
+            'fas fa-filter' : 'fas fa-times';
+    });
+
+    // Delete Modal Handler
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        document.getElementById('categoryName').textContent = button.dataset.categoryName;
+        document.getElementById('deleteForm').action = `/categories/delete/${button.dataset.categoryId}/`;
+    });
+
+    // Initial filter apply
+    applyFilters();
+});
+
+function clearAllFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('groupFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    currentFilters = { search: '', group: '', status: '' };
+    applyFilters();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="card container mt-5">
+  <h2 class="m-2">Assets</h2>
+
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Original Value</th>
+        <th>Date Acquired</th>
+        <th>Depreciation/Year</th>
+        <th>Total Depreciated</th>
+        <th>Current Value</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for asset in assets_list %}
+      <tr>
+        <td>{{ asset.name }}</td>
+        <td>Ugx Shs. {{ asset.value|intcomma }}</td>
+        <td>{{ asset.purchase_date }}</td>
+        <td>Ugx Shs. {{ asset.depreciation_per_year|floatformat:2|intcomma }}</td>
+        <td>Ugx Shs. {{ asset.total_depreciation|floatformat:2|intcomma }}</td>
+        <td>Ugx Shs. {{ asset.current_value|floatformat:2|intcomma }}</td>
+        <td>
+          <!-- Optional action like viewing or triggering depreciation -->
+          <a href="{% url 'asset_detail' asset.id %}" class="btn btn-sm btn-primary">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="mt-4">
+    <!-- Add this only if you have a view to register depreciation -->
+    <a href="{% url 'register_depreciation' %}" class="btn btn-success">
+      Register Depreciation for This Year
+    </a>
+  </div>
+</div>
+{% endblock %}

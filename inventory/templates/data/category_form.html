@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        border-radius: 1rem;
+        border: none;
+        margin-top: 2rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    h5.card-title {
+        margin-top: 2rem;
+        text-align: center;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    button.btn-primary {
+        padding: 0.75rem;
+        font-size: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    form .form-control {
+        border-radius: 0.5rem;
+    }
+</style>
+
+
+<h5 class="card-title fw-semibold mb-1">Register Menu Category</h5>
+
+<!-- Center the card and make it more spacious -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+                        {{form.as_p}}
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary w-100">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock content %}
