@@ -15,12 +15,16 @@ urlpatterns=[
     path('reservations/<int:pk>/update-status/', update_reservation_status, name='update_reservation_status'),
 
     
-    #Sauna
-    path('sauna/', add_sauna, name = 'add_sauna'),
-    path('sauna_customers/', sauna_customers, name = 'sauna_customers'),
-    path('print_sauna_order/<int:id>/', print_sauna_order, name='print_sauna_order'),
-    path('get_sauna_customer/<int:id>/', get_sauna_customer, name='get_sauna_customer'),
-
+    # Sauna
+    path('sauna/', add_sauna, name='add_sauna'),
+    path('sauna_customers/', sauna_customers, name='sauna_customers'),
+    path('print_sauna_order/<int:id>/',
+         print_sauna_order, name='print_sauna_order'),
+    path('get_sauna_customer/<int:id>/',
+         get_sauna_customer, name='get_sauna_customer'),
+    
+    
+    
     # Room Types and Rooms
     path('roomtypes/', rooms, name='rooms'),
     path('rooms/<str:id>/', rooms_filter, name='rooms-filter'),
@@ -29,5 +33,23 @@ urlpatterns=[
     # Reports
     path('report/csv/', generate_reservations_report, name='reservations_report'),
     path('<int:reservation_id>/pdf/', generate_reservation_pdf, name='reservation_pdf'),
+    
+    # Booking
+    path('booking/', roomBooking, name='room_booking'),
+    path('booking/create/', create_booking, name='create_booking'),
+    path('booked_rooms/', booked_rooms, name='booked_rooms'),
+    path('each_bookings/<int:id>/',
+         booking_detail, name='booking_detail'),
+    path('reservations/<int:reservation_id>/',
+         reservation_detail, name='reservation_detail'),
+    # urls.py
+
+    path('bookings/<int:booking_id>/convert/',
+      convert_to_reservation, name='convert_to_reservation'),
+
+    # urls.py
+    path('bookings/<int:booking_id>/confirm/',
+         confirm_booking, name='confirm_booking'),
 
 ]
+

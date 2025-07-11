@@ -364,8 +364,17 @@ def revenue(request):
 def expense(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
-
+    category = request.GET.get('category')
+    
     expense_list = Expense.objects.filter(is_active=True).order_by('-date')
+
+    if start_date:
+        expense_list = expense_list.filter(date__gte=start_date)
+    if end_date:
+        expense_list = expense_list.filter(date__lte=end_date)
+    if category:
+        expense_list = expense_list.filter(category=category)
+
 
     if start_date and end_date:
         try:

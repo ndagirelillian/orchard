@@ -91,6 +91,11 @@ class RoomReservation(models.Model):
     ]
 
     reservation_id = models.BigIntegerField(unique=True, editable=False, default=0)
+
+  
+    booking = models.OneToOneField(
+    'Booking', on_delete=models.SET_NULL, null=True, blank=True, related_name='reservation')
+
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='reservations')
     customer = models.CharField(max_length=100, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
@@ -165,8 +170,9 @@ class RoomReservation(models.Model):
         # If status has changed or this is a new reservation, update room availability
         if old_status != self.status or old_status is None:
             self.room.update_availability_status()
+# SAUNA
 
-#SAUNA
+
 class Sauna_services(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
@@ -175,9 +181,10 @@ class Sauna_services(models.Model):
     def __str__(self):
         return self.name
 
+
 class SaunaUser(models.Model):
     KEY_CHOICES = [
-    (f"key_{str(i).zfill(3)}", f"key_{str(i).zfill(3)}") for i in range(1, 17)
+        (f"key_{str(i).zfill(3)}", f"key_{str(i).zfill(3)}") for i in range(1, 17)
     ]
 
     GENDER_CHOICES = [
@@ -189,7 +196,8 @@ class SaunaUser(models.Model):
     service = models.ForeignKey(Sauna_services, on_delete=models.CASCADE)
     keys = models.CharField(max_length=100, choices=KEY_CHOICES)
     price = models.IntegerField(blank=True, null=True, editable=False)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
@@ -199,3 +207,48 @@ class SaunaUser(models.Model):
 
     def __str__(self):
         return self.customer_name
+
+class Booking(models.Model):
+    STATUS = [
+        ('new', 'New'),
+        ('reserved', 'Converted to Reservation'),
+        ('cancelled', 'Cancelled'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS, default='new')
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    contact = models.CharField(max_length=15)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    check_in = models.DateField()
+    check_out = models.DateField()
+    guests = models.IntegerField()
+    booking_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    special_requests = models.TextField(blank=True, null=True)
+
+
+    def convert_to_reservation(self, user=None):
+        if self.status == 'reserved':
+            return  # Already reserved
+
+        reservation = RoomReservation.objects.create(
+            room=self.room,
+            customer=f"{self.first_name} {self.last_name}",
+            email=self.email,
+            phone_number=self.contact,
+            check_in_date=self.check_in,
+            check_out_date=self.check_out,
+            special_requests=self.special_requests,
+            status='Confirmed',
+            created_by=user,
+            booking=self
+        )
+        self.status = 'reserved'
+        self.save()
+        return reservation
+
+    def __str__(self):
+        return f"{self.room} booking from {self.check_in} to {self.check_out}"
+    
+    
+    

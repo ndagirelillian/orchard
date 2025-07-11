@@ -3,7 +3,7 @@ from .models import Customer, SaunaUser, RoomReservation
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django import forms
-from .models import RoomType, Room
+from .models import *
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -182,4 +182,25 @@ class ReservationStatusUpdateForm(forms.ModelForm):
         fields = ['status']
         widgets = {
             'status': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = [
+            'first_name', 
+            'last_name', 
+            'email', 
+            'contact',
+            'room',
+            'check_in',
+            'check_out',
+            'guests',
+            'special_requests'
+        ]
+        widgets = {
+            'check_in': forms.DateInput(attrs={'type': 'date'}),
+            'check_out': forms.DateInput(attrs={'type': 'date'}),
+            'room': forms.HiddenInput(),
         }

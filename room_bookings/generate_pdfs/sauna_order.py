@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 from reportlab.lib.pagesizes import letter
-from room_bookings.models import *
+from inventory.models import *
 
 # Printing Receipt for transaction
 @login_required(login_url='/user/login/')

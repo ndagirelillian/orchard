@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header text-white text-center">
+                    <h4 class="mb-0">Booking Details</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr><th class="text-end pe-3">Booking Date:</th><td>{{ booking.booking_date }}</td></tr>
+                            <tr><th class="text-end pe-3">First Name:</th><td>{{ booking.first_name }}</td></tr>
+                            <tr><th class="text-end pe-3">Last Name:</th><td>{{ booking.last_name }}</td></tr>
+                            <tr><th class="text-end pe-3">Email:</th><td>{{ booking.email }}</td></tr>
+                            <tr><th class="text-end pe-3">Contact:</th><td>{{ booking.contact }}</td></tr>
+                            <tr><th class="text-end pe-3">Room:</th><td>{{ booking.room }}</td></tr>
+                            <tr><th class="text-end pe-3">Check In:</th><td>{{ booking.check_in }}</td></tr>
+                            <tr><th class="text-end pe-3">Check Out:</th><td>{{ booking.check_out }}</td></tr>
+                            <tr><th class="text-end pe-3">Guests:</th><td>{{ booking.guests }}</td></tr>
+                            <tr><th class="text-end pe-3">Special Requests:</th><td>{{ booking.special_requests|default:"None" }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-center d-flex justify-content-between flex-wrap">
+                    {% if not booking.reservation %}
+                        <a href="{% url 'convert_to_reservation' booking.id %}" class="btn btn-success mb-2">
+                            Convert to Reservation (Check-In)
+                        </a>
+                    {% else %}
+                        <a href="{% url 'reservation_detail' booking.reservation.id %}" class="btn btn-primary mb-2">
+                            View Reservation
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'booked_rooms' %}" class="btn btn-secondary mb-2">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

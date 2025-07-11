@@ -33,10 +33,20 @@
           value="{{ end_date }}"
         />
       </div>
+      <div class="col-md-3">
+        <label for="category" class="form-label">Category</label>
+        <select name="category" id="category" class="form-select">
+            <option value="">All</option>
+            {% for code, name in expense_choices %}
+                <option value="{{ code }}" {% if selected_category == code %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
       <div class="col-md-2">
         <button type="submit" class="btn btn-primary w-100">Filter</button>
       </div>
     </form>
+
 
     <!-- expense Table -->
     <div class="table-responsive">

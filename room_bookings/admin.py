@@ -1,14 +1,14 @@
 from django.contrib import admin
 from .models import (
-     RoomType,
-    HotelBranch, Room, Customer, RoomReservation, SaunaUser, Sauna_services
+    RoomType,
+    HotelBranch, Room, Customer, RoomReservation, SaunaUser, Sauna_services, Booking
 )
 
 
 @admin.register(Sauna_services)
 class Sauner_serviceAdmin(admin.ModelAdmin):
-    list_display=['name', 'description', 'price',]
-    search_fields=['name',]
+    list_display = ['name', 'description', 'price',]
+    search_fields = ['name',]
 
 
 @admin.register(SaunaUser)
@@ -20,29 +20,47 @@ class SaunaUserAdmin(admin.ModelAdmin):
 
 
 
+@admin.register(Booking)
+class BookingAdmin(admin.ModelAdmin):
+    list_display = ['status','booking_date', 'first_name', 'last_name', 'email', 'contact', 'room', 'check_in', 'check_out', 'guests', 'special_requests'
+
+                    ]
+    search_fields = [
+        'first_name', 'last_name', 'room'
+
+    ]
+
+
 @admin.register(RoomType)
 class RoomTypeAdmin(admin.ModelAdmin):
     list_display = ['name', 'base_price']
     search_fields = ['name']
+
 
 @admin.register(HotelBranch)
 class HotelBranchAdmin(admin.ModelAdmin):
     list_display = ['name', 'city', 'country']
     search_fields = ['name', 'city']
 
+
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ['room_number', 'room_type', 'hotel', 'is_available', 'capacity']
+    list_display = ['room_number', 'room_type',
+                    'hotel', 'is_available', 'capacity']
     list_filter = ['room_type', 'hotel', 'is_available']
     search_fields = ['room_number', 'room_type__name', 'hotel__name']
+
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'email', 'phone_number']
     search_fields = ['first_name', 'last_name', 'email']
 
+
 @admin.register(RoomReservation)
 class RoomReservationAdmin(admin.ModelAdmin):
-    list_display = ['reservation_id', 'room', 'customer', 'check_in_date', 'check_out_date', 'status']
+    list_display = ['reservation_id', 'room', 'customer',
+                    'check_in_date', 'check_out_date', 'status']
     list_filter = ['check_in_date', 'check_out_date', 'status']
-    search_fields = ['reservation_id', 'customer__first_name', 'customer__last_name']
+    search_fields = ['reservation_id',
+                     'customer__first_name', 'customer__last_name']

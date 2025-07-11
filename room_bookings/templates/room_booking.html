@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HotelPro Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hotel-blue': '#0f4c75',
+                        'hotel-gold': '#f9a826',
+                        'hotel-light': '#f8f9fa',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(15, 76, 117, 0.2);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Toast Messages -->
+    {% if messages %}
+    <div class="fixed top-4 right-4 z-50 space-y-2">
+        {% for message in messages %}
+        <div class="flex items-center justify-between min-w-72 max-w-md p-4 rounded-lg shadow-lg
+                {% if message.tags == 'error' or message.tags == 'danger' %}
+                  bg-red-100 border border-red-200 text-red-800
+                {% elif message.tags == 'warning' %}
+                  bg-yellow-100 border border-yellow-200 text-yellow-800
+                {% elif message.tags == 'success' %}
+                  bg-green-100 border border-green-200 text-green-800
+                {% elif message.tags == 'info' %}
+                  bg-blue-100 border border-blue-200 text-blue-800
+                {% else %}
+                  bg-gray-100 border border-gray-200 text-gray-800
+                {% endif %}" role="alert">
+
+            <div class="flex items-start">
+                <!-- Icon based on message type -->
+                <div class="flex-shrink-0 mr-3">
+                    {% if message.tags == 'error' or message.tags == 'danger' %}
+                    <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% elif message.tags == 'warning' %}
+                    <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% elif message.tags == 'success' %}
+                    <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% else %}
+                    <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% endif %}
+                </div>
+
+                <!-- Message text -->
+                <div class="text-sm font-medium">
+                    {{ message }}
+                </div>
+            </div>
+
+            <!-- Close button -->
+            <button type="button" class="ml-4 flex-shrink-0 p-1 rounded-md hover:bg-black hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-offset-2
+                     {% if message.tags == 'error' or message.tags == 'danger' %}
+                       text-red-600 focus:ring-red-500
+                     {% elif message.tags == 'warning' %}
+                       text-yellow-600 focus:ring-yellow-500
+                     {% elif message.tags == 'success' %}
+                       text-green-600 focus:ring-green-500
+                     {% elif message.tags == 'info' %}
+                       text-blue-600 focus:ring-blue-500
+                     {% else %}
+                       text-gray-600 focus:ring-gray-500
+                     {% endif %}" onclick="this.parentElement.remove()">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">H</span>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800">HotelPro Booking</h1>
+                </div>
+
+                <!-- Powered by -->
+                <p class="text-sm text-gray-500">
+                    Powered by <span class="text-yellow-600 font-medium">Digital Chronicles</span>
+                </p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Content -->
+    <section id="hero" class="relative min-h-screen bg-cover bg-center bg-no-repeat"
+        style="background-image: url('https://i.pinimg.com/736x/93/4d/b7/934db7616c51a235d580c2e7fd589bdc.jpg');">
+        <!-- Background overlay with blur effect -->
+        <div class="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 max-w-4xl mx-auto px-4 py-4">
+            <!-- Header -->
+            <div class="text-center mb-4 pt-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                    Find Your Perfect
+                    <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Stay</span>
+                </h1>
+                <p class="text-xl text-white max-w-2xl mx-auto drop-shadow-md">
+                    Discover amazing accommodations tailored to your preferences
+                </p>
+            </div>
+
+            <!-- Search Form -->
+            <div class="bg-white bg-opacity-95 backdrop-blur-sm rounded-xl shadow-2xl p-6 mt-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Search Available Rooms</h2>
+
+                <form method="get" action="{% url 'room_booking' %}" class="space-y-4">
+                    <!-- Form Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Number of Guests -->
+                        <div>
+                            <label for="guests" class="block text-sm font-medium text-gray-700 mb-2">
+                                Number of Guests
+                            </label>
+                            <input type="number" name="guests" id="guests" min="1" placeholder="0"
+                                value="{{ request.GET.guests|default:'' }}" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <!-- Check-in Date -->
+                        <div>
+                            <label for="check_in" class="block text-sm font-medium text-gray-700 mb-2">
+                                Check-in Date
+                            </label>
+                            <input type="date" name="check_in" id="check_in" required
+                                value="{{ request.GET.check_in|default:'' }}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <!-- Check-out Date -->
+                        <div>
+                            <label for="check_out" class="block text-sm font-medium text-gray-700 mb-2">
+                                Check-out Date
+                            </label>
+                            <input type="date" name="check_out" id="check_out" required
+                                value="{{ request.GET.check_out|default:'' }}"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="flex items-end">
+                            <button type="submit"
+                                class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium shadow-lg hover:shadow-xl">
+                                Search Rooms
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Popular Features -->
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-6 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Easy Booking</h3>
+                    <p class="text-sm text-gray-600">Quick and simple reservation process</p>
+                </div>
+
+                <div class="text-center p-6 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Best Prices</h3>
+                    <p class="text-sm text-gray-600">Competitive rates guaranteed</p>
+                </div>
+
+                <div class="text-center p-6 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl shadow-lg">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Great Service</h3>
+                    <p class="text-sm text-gray-600">24/7 customer support</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Available Rooms Section -->
+    <section class="bg-gray-100 py-16">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Available Rooms</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Choose from our selection of comfortable and well-appointed
+                    rooms</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for room in available_rooms %}
+                <div
+                    class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <!-- Room Image -->
+                    <div class="relative h-48 overflow-hidden">
+                        {% if room.room_image %}
+                        <img src="{{ room.room_image.url }}" alt="Room {{ room.room_number }}"
+                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            onerror="this.onerror=null; this.src='https://i.pinimg.com/736x/fc/7e/ce/fc7ece8e8ee1f5db97577a4622f33975.jpg';">
+                        {% else %}
+                        <img src="https://i.pinimg.com/736x/fc/7e/ce/fc7ece8e8ee1f5db97577a4622f33975.jpg"
+                            alt="Room {{ room.room_number }}"
+                            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                        {% endif %}
+
+                        <!-- Room Number Badge -->
+                        <div
+                            class="absolute top-4 left-4 bg-white bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full">
+                            <span class="text-sm font-semibold text-gray-800">Room {{ room.room_number }}</span>
+                        </div>
+
+                        <!-- Available Badge -->
+                        <div
+                            class="absolute top-4 right-4 bg-green-500 bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full">
+                            <span class="text-xs font-medium text-white">Available</span>
+                        </div>
+                    </div>
+
+                    <!-- Room Details -->
+                    <div class="p-6">
+                        <!-- Room Type -->
+                        <div class="mb-3">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">{{ room.room_type.name }}</h3>
+                            {% if room.description %}
+                            <p class="text-sm text-gray-600 line-clamp-2">{{ room.description }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Room Features -->
+                        <div class="flex items-center justify-between mb-4">
+                            <!-- Capacity -->
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <span class="text-sm text-gray-700">
+                                    {{ room.capacity }}
+                                    Guest{{ room.capacity|pluralize}}
+                                </span>
+                            </div>
+
+                            <!-- Floor Info -->
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0v-3.28a1 1 0 01.684-.948l1.923-.641a1 1 0 00.632-.928c0-.344.23-.64.556-.784a1 1 0 00.632-.928V8a1 1 0 011-1h4a1 1 0 011 1v8.368c0 .344.23.64.556.784a1 1 0 00.632.928c0 .344.23.64.556.784l1.923.641A1 1 0 0121 17.72V21">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <span class="text-sm text-gray-700">Floor {{ room.floor }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Price and Book Button -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xl font-bold text-gray-800">
+                                    UGX {{ room.price_per_night|floatformat:0 }}
+                                </span>
+                                <span class="text-sm text-gray-500">/night</span>
+                            </div>
+                            <button data-bs-toggle="modal" data-bs-target="#bookingModal" data-room-id="{{ room.id }}"
+                                data-room-number="{{ room.room_number }}" data-room-type="{{ room.room_type.name }}"
+                                data-room-price="{{ room.price_per_night }}"
+                                data-room-image="{% if room.room_image %}{{ room.room_image.url }}{% else %}https://i.pinimg.com/736x/fc/7e/ce/fc7ece8e8ee1f5db97577a4622f33975.jpg{% endif %}"
+                                class="book-now-btn w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 mt-3 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0v-3.28a1 1 0 01.684-.948l1.923-.641a1 1 0 00.632-.928c0-.344.23-.64.556-.784a1 1 0 00.632-.928V8a1 1 0 011-1h4a1 1 0 011 1v8.368c0 .344.23.64.556.784a1 1 0 00.632.928c0 .344.23.64.556.784l1.923.641A1 1 0 0121 17.72V21">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No Available Rooms</h3>
+                    <p class="text-gray-500">No rooms found for the selected dates. Please try different dates.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-xl overflow-hidden border-0">
+                <!-- Modal Header -->
+                <div class="modal-header bg-gradient-to-r from-blue-600 to-blue-800 p-5">
+                    <div class="w-full">
+                        <h3 class="modal-title text-white text-2xl font-bold flex items-center">
+                            <i class="fas fa-calendar-check mr-3"></i>
+                            Book Your Stay
+                        </h3>
+                        <p class="text-blue-100 mt-1">Complete your reservation by providing your details</p>
+                    </div>
+                    <button type="button" class="text-white opacity-80 hover:opacity-100 text-xl"
+                        data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body p-5">
+                    <form id="bookingForm" method="post" action="{% url 'create_booking' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="room" id="modalRoomId" value="">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Left Column - Room Info -->
+                            <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                                <div class="flex items-start mb-4">
+                                    <div class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden mr-4">
+                                        <img id="modalRoomImage" src="" alt="Room image"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-800" id="modalRoomType"></h4>
+                                        <p class="text-sm text-gray-600 mb-1">Room <span id="modalRoomNumber"></span>
+                                        </p>
+                                        <div class="flex items-center text-sm">
+                                            <span class="text-green-600 font-medium mr-2">
+                                                <i class="fas fa-check-circle mr-1"></i> Available
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="modalCheckIn"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Check-in Date</label>
+                                        <input type="date" name="check_in" id="modalCheckIn" required
+                                            value="{{ request.GET.check_in|default:'' }}"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus">
+                                    </div>
+                                    <div>
+                                        <label for="modalCheckOut"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
+                                        <input type="date" name="check_out" id="modalCheckOut" required
+                                            value="{{ request.GET.check_out|default:'' }}"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus">
+                                    </div>
+                                    <div>
+                                        <label for="modalGuests"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Number of
+                                            Guests</label>
+                                        <input type="number" name="guests" id="modalGuests" min="1" required
+                                            value="{{ request.GET.guests|default:'' }}"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus">
+                                    </div>
+                                    <div class="flex justify-between pt-2">
+                                        <span class="text-lg font-bold text-gray-800">Total:</span>
+                                        <span class="text-xl font-bold text-blue-600" id="modalTotalPrice"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Guest Information -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Guest Information</h4>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">
+                                                First Name <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="first_name" id="firstName" required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus"
+                                                placeholder="John">
+                                        </div>
+                                        <div>
+                                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Last Name <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="last_name" id="lastName" required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus"
+                                                placeholder="Doe">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Email <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="email" name="email" id="email" required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus"
+                                            placeholder="john@example.com">
+                                    </div>
+
+                                    <div>
+                                        <label for="contact" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Contact Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="tel" name="contact" id="contact" required
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus"
+                                            placeholder="+256 701234567">
+                                    </div>
+
+                                    <div>
+                                        <label for="specialRequests"
+                                            class="block text-sm font-medium text-gray-700 mb-1">
+                                            Special Requests
+                                        </label>
+                                        <textarea name="special_requests" id="specialRequests" rows="3"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none input-focus"
+                                            placeholder="Any special requirements or requests..."></textarea>
+                                    </div>
+
+                                    <div class="flex items-center">
+                                        <input id="terms" name="terms" type="checkbox"
+                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            required>
+                                        <label for="terms" class="ml-2 block text-sm text-gray-700">
+                                            I agree to the <a href="#" class="text-blue-600 hover:underline">terms and
+                                                conditions</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer bg-gray-50 px-5 py-4">
+                    <div class="flex w-full justify-between">
+                        <button type="button" class="px-4 py-2 text-gray-600 font-medium hover:text-gray-800"
+                            data-bs-dismiss="modal">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Rooms
+                        </button>
+                        <button type="submit" form="bookingForm"
+                            class="px-6 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-150">
+                            <i class="fas fa-check-circle mr-2"></i> Confirm Booking
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+    <script>
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('check_in').setAttribute('min', today);
+        document.getElementById('check_out').setAttribute('min', today);
+
+        // Update checkout min date when checkin changes
+        document.getElementById('check_in').addEventListener('change', function () {
+            const checkinDate = this.value;
+            document.getElementById('check_out').setAttribute('min', checkinDate);
+        });
+
+        // Handle booking modal population
+        document.addEventListener('DOMContentLoaded', function () {
+            const bookingModal = document.getElementById('bookingModal');
+
+            bookingModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const roomId = button.getAttribute('data-room-id');
+                const roomNumber = button.getAttribute('data-room-number');
+                const roomType = button.getAttribute('data-room-type');
+                const roomPrice = button.getAttribute('data-room-price');
+                const roomImage = button.getAttribute('data-room-image');
+
+                // Set modal content
+                document.getElementById('modalRoomId').value = roomId;
+                document.getElementById('modalRoomNumber').textContent = roomNumber;
+                document.getElementById('modalRoomType').textContent = roomType;
+                document.getElementById('modalRoomImage').src = roomImage;
+
+                // Calculate total price
+                updateTotalPrice(roomPrice);
+            });
+
+            // Add event listeners to recalculate price when dates change
+            document.getElementById('modalCheckIn').addEventListener('change', function () {
+                const roomPrice = document.querySelector('.book-now-btn[data-bs-target="#bookingModal"]')?.getAttribute('data-room-price');
+                updateTotalPrice(roomPrice);
+            });
+
+            document.getElementById('modalCheckOut').addEventListener('change', function () {
+                const roomPrice = document.querySelector('.book-now-btn[data-bs-target="#bookingModal"]')?.getAttribute('data-room-price');
+                updateTotalPrice(roomPrice);
+            });
+
+            function updateTotalPrice(pricePerNight) {
+                const checkIn = document.getElementById('modalCheckIn').value;
+                const checkOut = document.getElementById('modalCheckOut').value;
+
+                if (checkIn && checkOut) {
+                    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+                    const start = new Date(checkIn);
+                    const end = new Date(checkOut);
+
+                    // Calculate nights (difference in days)
+                    const diffDays = Math.round(Math.abs((end - start) / oneDay));
+
+                    // Calculate total price
+                    const total = diffDays * parseFloat(pricePerNight);
+
+                    // Format as currency
+                    document.getElementById('modalTotalPrice').textContent = 'UGX ' + total.toLocaleString();
+                }
+            }
+
+            // Auto-dismiss toast messages after 5 seconds
+            const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            toastElList.map(function (toastEl) {
+                setTimeout(() => {
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.hide();
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+
+</html>

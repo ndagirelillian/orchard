@@ -26,7 +26,7 @@
             <div class="row galler-top">
 
 
-                {% for item in dishes %}
+                {% for item in food %}
                 <div class="col-md-2 col-sm-4 protfolio-item hover14 mt-2">
                     <a href="foods/{{item.id}}" data-lightbox="example-set" data-title="Magazine Content Writing">
                         <figure>
@@ -41,8 +41,8 @@
 
                             <div class="p-4">
                                 <p>Orchards</p>
-                                <p class="fw-bold" style="white-space: normal; word-wrap: break-word; color: #000;">{{
-                                    item.name }}</p>
+                                <p class="fw-bold" style="white-space: normal; word-wrap: break-word; color: #000;">
+                                    {{ item.name }}</p>
                             </div>
                         </figure>
                     </a>
