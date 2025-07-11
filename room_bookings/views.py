@@ -286,7 +286,7 @@ def create_booking(request):
     return redirect('room_booking')
 
 def booked_rooms(request):
-    bookings = Booking.objects.all().order_by('booking_date')
+    bookings = Booking.objects.all().order_by('-booking_date')
     paginator = Paginator(bookings, 10)
     
     page_number= request.GET.get('page')
