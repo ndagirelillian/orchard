@@ -10,6 +10,7 @@ from inventory.models import OrderItem, OrderTransaction
 @login_required(login_url='/user/login/')
 def print_order_receipt(request, order_id):
     # Create a buffer to hold the PDF data
+    
     buffer = BytesIO()
 
     # Define the PDF size (width x height) for a 57 mm wide receipt
