@@ -3,18 +3,8 @@
 {% block content %}
 <div class="card">
   <div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-            <div class="d-flex flex-wrap gap-2 mb-3 mb-md-0">
-              <a href="/room_bookings/sauna/" class="btn btn-primary">
-                    <i class="fas fa-plus-circle"></i> Add Sauna
-                </a>
-                <a href="/room_bookings/cleared_sauna" class="btn btn-info">
-                    <i class="fas fa-check-circle"></i> Cleared Transactions
-                </a>
-            </div>
-        </div>
     <div class="row">
-      <h4 class="fw-semibold mb-2">Sauna Customers</h4>
+      <h4 class="fw-semibold mb-2"> Cleared Sauna Customers</h4>
 
 
       <div class="container mt-3">
@@ -27,17 +17,12 @@
               <th>Service</th>
               <th>Keys</th>
               <th>Date</th>
-              <th>Payment Satus</th>
               <th>Action</th>
-              
-              <th>Update Payment</th>
+              <th>Payment</th>
             </tr>
           </thead>
           <tbody>
             {% for saunacustomer in sauna_list %}
-            {% if saunacustomer.payment_mode == "NO PAYMENT" or saunacustomer.payment_mode == "ON ACCOMMODATION" %}
-   
-                
             <tr>
               <td>{{ saunacustomer.random_id }}</td>
               <td>{{ saunacustomer.customer_name }}</td>
@@ -45,22 +30,16 @@
               <td>{{ saunacustomer.service }}</td>
               <td>{{ saunacustomer.keys }}</td>
               <td>{{ saunacustomer.order_date }}</td>
-              <td>{{ saunacustomer.payment_mode }}</td>
               <td>
                 <a href="/room_bookings/get_sauna_customer/{{ saunacustomer.id }}" class="btn btn-primary btn-sm">
                   View
                 </a>
               </td>
-              
               <td>
-                <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#paymentModal"
-                  data-order-id="{{ saunacustomer.id }}" data-random-id="{{ saunacustomer.random_id }}">
-                  Payment
-                </button>
+               {{saunacustomer.payment_mode}}
               </td>
-              
             </tr>
-            {% endif %}
+           
             {% empty %}
             <tr>
               <td colspan="9" class="text-center">No customers available</td>
@@ -143,40 +122,5 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> <!-- Full jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-  $('#paymentModal').on('show.bs.modal', function (event) {
-    const button = $(event.relatedTarget);
-    const orderId = button.data('order-id');
-    const randomId = button.data('random-id');
 
-    const modal = $(this);
-    modal.find('#modalOrderId').text(randomId);
-    modal.find('#modalOrderInput').val(orderId);
-  });
-
-  $('#paymentForm').on('submit', function (e) {
-    e.preventDefault();
-
-    const orderId = $('#modalOrderInput').val();
-    const paymentMode = $('#payment_mode').val();
-    const transactionId = $('#transaction_id').val();
-    const csrfToken = $('[name=csrfmiddlewaretoken]').val();
-
-    $.ajax({
-      url: `/room_bookings/saunatransaction/${orderId}/payment/`,
-      type: 'POST',
-      data: {
-        csrfmiddlewaretoken: csrfToken,
-        payment_mode: paymentMode,
-        transaction_id: transactionId
-      },
-      success: function () {
-        location.reload();
-      },
-      error: function () {
-        alert("Failed to submit payment. Please try again.");
-      }
-    });
-  });
-</script>
 {% endblock %}

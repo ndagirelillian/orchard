@@ -1,85 +1,93 @@
 {% extends 'base.html' %}
-{% load humanize%}
+{% load humanize %}
 
 {% block content %}
-<div class="card" id="receipt">
+<div class="">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-6 mx-auto">
+            <div id="receipt" class="col-md-8 mx-auto">
                 <div class="card">
                     <div class="card-body">
                         <div>
-                            <h3 class="text-center mb-4">{{ setting.hotel_name | default:"" }}</h3>
-                            <div class="row">
-                                <div class="col">{{ setting.phone_number | default:"" }}</div> <div class="col">{{ setting.email | default:"" }}</div>
-                            </div>
+                            <h2 class="text-center mb-4">Orchard Motel</h2>
                         </div>
-                        <h5 class="text-center mb-4">Sauna  Receipt</h5>
-                        <p><strong class="text-bold">Receipt Number: </strong></p>
+                        <h3 class="text-center mb-4">Sauna Receipt</h3>
+                        <p><strong>Order Number:</strong> {{ customer.random_id }} </p>
 
                         <div class="row">
                             <div class="col-6">
-                                <h6>Customer:</h6>
-                                <p>{{ customer.customer_name }}</p>
+                                <h4>{{ customer.customer_name }}</h4>
+                                
                             </div>
                             <div class="col-6 text-right">
-                                <h6>Date :</h6>
-                                <p>{{ customer.order_date }}</p>
+                                <h4>{{ customer.order_date }}</h4>
+                                
                             </div>
                         </div>
 
-                        
+                        <h4>Services  Received</h4>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                            
                                     <th>Service</th>
                                     <th>Key</th>
                                     <th>Price</th>
                                 </tr>
                             </thead>
                             <tbody>
+                              
                                 <tr>
-                                    
                                     <td>{{ customer.service }}</td>
                                     <td>{{ customer.keys }}</td>
                                     <td>{{ customer.price|intcomma }}</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="2" class="text-right"><strong>Total</strong></td>
+                                    <td><strong>{{ customer.price|intcomma }}</strong></td>
+                              
                             </tbody>
                         </table>
 
-
-                        <div class="row">
-
-
-                        </div>
-
-                        <hr>
-
                         <div class="text-center">
-                            <p><strong>Thank you for staying with us!</strong></p>
-                            <p><em>Created by: {{ customer.created_by.username }}</em></p>
+                            <p><strong>Thank you for dining with us!</strong></p>
+                            <p><em>Created by: {{ order.created_by.username }}</em></p>
                         </div>
                     </div>
-
-
-
-                    <div class="row">
-                        <div class="col-auto">
-                            <button onclick="printReceiptDiv()" class="btn btn-primary no-print">Print Receipt</button>
-                        </div>
-                    </div>
-
-
                 </div>
-               
+                <div class="row mt-3">
+                    <div class="col-auto">
+                        <button onclick="printReceiptDiv()" class="btn btn-primary no-print">Print Receipt</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <h5 class="text-center my-4">Balance Calculator</h5>
+                    <div class="mx-4">
+                        <div class="mt-4">
+                            <label class="fw-bold" for="amountGiven">Amount Given:</label>
+                            <input type="number" id="amountGiven" class="form-control">
+                        </div>
+
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="calculateBalance()" disabled>
+                                Calculate Balance
+                            </button>
+                        </div>
+
+                        <div class="my-2">
+                            <label class="fw-bold" for="balance">Balance:</label>
+                            <input type="text" id="balance" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Store total price as a JavaScript variable for calculation
     const totalPrice = parseFloat("{{ total_price|floatformat:2 }}") || 0;
 
     function calculateBalance() {
@@ -89,7 +97,6 @@
         document.getElementById('balance').value = balance >= 0 ? balance.toFixed(2) : 'Insufficient amount';
     }
 
-    // Enable button only when amount is entered
     document.getElementById('amountGiven').addEventListener('input', function () {
         document.querySelector('button[onclick="calculateBalance()"]').disabled = !this.value;
     });
@@ -99,7 +106,45 @@
         var printWindow = window.open("", "", "height=600,width=800");
         printWindow.document.write('<html><head><title>Print Receipt</title>');
         printWindow.document.write('<style>');
-        printWindow.document.write('@media print { body { font-family: Arial; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 5px; } .no-print { display: none; } }');
+        printWindow.document.write(`
+            @media print {
+                body {
+                    font-family: monospace;
+                    font-size: 10px;
+                    margin: 0;
+                    padding: 0;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: none;
+                    padding: 2px 4px;
+                    word-wrap: break-word;
+                }
+                th {
+                    text-align: left;
+                    font-weight: bold;
+                }
+                td {
+                    text-align: left;
+                }
+                .text-right {
+                    text-align: right;
+                }
+                .text-center {
+                    text-align: center;
+                }
+                .no-print {
+                    display: none;
+                }
+                @page {
+                    margin: 0;
+                    size: 48mm auto;
+                }
+            }
+        `);
         printWindow.document.write('</style>');
         printWindow.document.write('</head><body>');
         printWindow.document.write(receiptContent);
@@ -111,12 +156,10 @@
     }
 </script>
 
-
 {% endblock content %}
 
 {% block extra_css %}
 <style>
-    /* Hide unnecessary elements during print */
     @media print {
         body * {
             visibility: hidden;

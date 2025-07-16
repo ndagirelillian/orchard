@@ -1,3 +1,5 @@
+from django.core.mail import send_mail
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -124,7 +126,7 @@ def add_sauna(request):
 
 @login_required(login_url='/user/login/')
 def sauna_customers(request):
-    saunacustomers = SaunaUser.objects.all()
+
     sauna_list = SaunaUser.objects.all().select_related(
         'service', 'created_by').order_by('-order_date')
     paginator = Paginator(sauna_list, 10)
@@ -136,6 +138,17 @@ def sauna_customers(request):
     sauna_list = paginator.get_page(page_number)
 
     return render(request, "sauna_customers.html", {"sauna_list": sauna_list})
+
+
+@login_required
+def SaunaclearedTransactions(request):
+    sauna_list = SaunaUser.objects.filter(
+        payment_mode__in=["CASH", "MOMO PAY", "AIRTEL PAY"]).order_by('-id')
+    page = request.GET.get('page')
+    sauna_page = Paginator(sauna_list, 10).get_page(page)
+    return render(request, "cleared_Sauna.html", {"sauna_list": sauna_page})
+
+
 
 
 # View for a single sauna customer's details
@@ -151,6 +164,21 @@ def get_sauna_customer(request, id):
 
     # Render the customer's details in the template
     return render(request, 'eachsauna_customer.html', {'customer': customer})
+
+#sauna payments status update
+
+
+@login_required(login_url='/user/login/')
+def sauner_transaction_payment(request, sauna_id):
+    sauna = get_object_or_404(SaunaUser, id=sauna_id)
+
+    if request.method == 'POST':
+        sauna.payment_mode = request.POST.get('payment_mode')
+        sauna.transaction_id = request.POST.get('transaction_id')
+        sauna.save()
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=400)
 
 
 
@@ -248,8 +276,71 @@ def roomBooking(request):
     })
 
 
-
 def create_booking(request):
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+
+            # Additional validation
+            if booking.check_in >= booking.check_out:
+                messages.error(
+                    request, "Check-out date must be after check-in date")
+                return redirect('room_booking')
+
+            if booking.guests > booking.room.capacity:
+                messages.error(
+                    request, "Number of guests exceeds room capacity")
+                return redirect('room_booking')
+
+            # Check room availability
+            overlapping_bookings = Booking.objects.filter(
+                room=booking.room,
+                check_in__lt=booking.check_out,
+                check_out__gt=booking.check_in
+            ).exists()
+
+            if overlapping_bookings:
+                messages.error(
+                    request, "Room is not available for the selected dates")
+                return redirect('room_booking')
+
+            booking.save()
+
+            # ✅ Send email to multiple recipients
+            subject = 'New Room Booking Notification'
+            message = (
+                f"A new booking has been made:\n\n"
+                f"Name: {booking.first_name}\n"
+                f"Email: {booking.email}\n"
+                f"Room: {booking.room}\n"
+                f"Check-in: {booking.check_in}\n"
+                f"Check-out: {booking.check_out}\n"
+                f"Guests: {booking.guests}"
+            )
+            recipient_list = [
+                'lillygires20@gmail.com',
+                'ndagirelillian15@gmail.com',
+                'orchardmotel01@gmail.com',
+                'brian6mugisha@gmail.com'
+            ]  # Add as many as you need
+
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
+                      recipient_list, fail_silently=False)
+
+            messages.success(
+                request, "Booking created successfully! We will contact you by email in a short time.")
+            return redirect('room_booking')
+        else:
+            # Form has errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    return redirect('room_booking')
+
+
+
+# def create_booking(request):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
@@ -317,16 +408,6 @@ def convert_to_reservation(request, booking_id):
     return redirect('booked_rooms')
 
 
-# def confirm_booking(request, booking_id):
-#     booking = Booking.objects.get(id=booking_id)
-#     if booking.status != 'reserved':
-#         reservation = booking.convert_to_reservation(user=request.user)
-#         messages.success(
-#             request, f"Booking confirmed and reservation created for {reservation.customer}")
-#     else:
-#         messages.info(
-#             request, "This booking is already converted to a reservation.")
-#     return redirect('booking_detail')
 
 
 def confirm_booking(request, booking_id):

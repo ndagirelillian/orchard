@@ -6,7 +6,7 @@ class OtherPackageForm(forms.ModelForm):
     class Meta:
         model = OtherPackage
         fields = '__all__'
-        exclude = ['created_by']
+        exclude = ['created_by', 'balance']
         widgets = {
             'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),

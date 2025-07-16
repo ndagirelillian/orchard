@@ -18,10 +18,14 @@ urlpatterns=[
     # Sauna
     path('sauna/', add_sauna, name='add_sauna'),
     path('sauna_customers/', sauna_customers, name='sauna_customers'),
+    path('cleared_sauna/', SaunaclearedTransactions, name='cleared_sauna'),
     path('print_sauna_order/<int:id>/',
          print_sauna_order, name='print_sauna_order'),
     path('get_sauna_customer/<int:id>/',
          get_sauna_customer, name='get_sauna_customer'),
+    path('saunatransaction/<int:sauna_id>/payment/',
+         sauner_transaction_payment, name='sauna_payment'),
+    
     
     
     

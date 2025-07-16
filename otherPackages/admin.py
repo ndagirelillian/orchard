@@ -3,7 +3,7 @@ from .models import OtherPackage
 
 @admin.register(OtherPackage)
 class OtherPackageAdmin(admin.ModelAdmin):
-    list_display = ('client_name', 'service_type', 'start_time', 'end_time', 'status', 'total_amount')
+    list_display = ('client_name', 'service_type', 'start_time', 'end_time', 'status', 'total_amount','amount_paid', 'balance', 'created_at', 'updated_at')
     list_filter = ('service_type', 'status', 'created_at')
     search_fields = ('client_name', 'description')
     date_hierarchy = 'start_time'

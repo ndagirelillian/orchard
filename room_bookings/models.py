@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 import random
+import uuid
+
+
+def generate_random_id():
+    return str(random.randint(100000, 999999))
 
 class RoomType(models.Model):
     name = models.CharField(max_length=50)
@@ -191,11 +196,25 @@ class SaunaUser(models.Model):
         ('M', 'Male'),
         ('F', 'Female'),
     ]
+    PAY_MODE = (
+        ("NO PAYMENT", "NO PAYMENT"),
+        ("CASH", "CASH"),
+        ("MOMO PAY", "MOMO PAY"),
+        ("AIRTEL PAY", "AIRTEL PAY"),
+        ("ON ACCOMMODATION", "ON ACCOMMODATION"),
+    )
+
+
+    random_id = models.CharField(max_length=6, unique=True, editable=False, default=generate_random_id)
     customer_name = models.CharField(max_length=100)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     service = models.ForeignKey(Sauna_services, on_delete=models.CASCADE)
     keys = models.CharField(max_length=100, choices=KEY_CHOICES)
     price = models.IntegerField(blank=True, null=True, editable=False)
+    payment_mode = models.CharField(
+         max_length=20, choices=PAY_MODE, default="NO PAYMENT")
+    transaction_id = models.CharField(
+        blank=True, null=True, max_length=100, help_text="Transaction ID / Invoice Number")
     created_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -207,6 +226,7 @@ class SaunaUser(models.Model):
 
     def __str__(self):
         return self.customer_name
+
 
 class Booking(models.Model):
     STATUS = [

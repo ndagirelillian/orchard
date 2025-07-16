@@ -7,15 +7,16 @@ from .models import (
 
 @admin.register(Sauna_services)
 class Sauner_serviceAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description', 'price',]
-    search_fields = ['name',]
+    list_display = ['name', 'description', 'price']
+    search_fields = ['name', ]
 
 
 @admin.register(SaunaUser)
 class SaunaUserAdmin(admin.ModelAdmin):
-    list_display = ['customer_name', 'gender',
+    list_display = ['customer_name', 'gender', 'payment_mode',
                     'service', 'keys', 'price', 'order_date']
-    search_fields = ['customer_name', 'gender',  'service', 'order_date']
+    search_fields = ['customer_name', 'gender',
+                     'payment_mode', 'service', 'order_date']
 
 
 

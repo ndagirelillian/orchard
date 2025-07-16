@@ -13,11 +13,13 @@
         <div class="card-body">
             <table class="table table-hover">
                 <thead class="table-light">
-                    <tr>
+                    <tr><th>Date</th>
                         <th>Client</th>
                         <th>Service</th>
                         <th>Duration</th>
-                        <th>Amount</th>
+                        <th>Total Amount</th>
+                        <th>Amount Paid</th>
+                        <th>Balance</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -25,10 +27,13 @@
                 <tbody>
                     {% for package in packages %}
                     <tr>
+                        <td>{{ package.created_at }}</td>
                         <td>{{ package.client_name }}</td>
                         <td>{{ package.get_service_type_display }}</td>
                         <td>{{ package.duration }} hours</td>
                         <td>Ugx Shs. {{ package.total_amount|intcomma }}</td>
+                        <td>Ugx Shs. {{ package.amount_paid|intcomma }}</td>
+                        <td>Ugx Shs. {{ package.balance|intcomma }}</td>
                         <td>
                             <span class="badge 
                                 {% if package.status == 'Completed' %}bg-success

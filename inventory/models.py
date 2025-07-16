@@ -71,6 +71,7 @@ class OrderTransaction(models.Model):
         ("MOMO PAY", "MOMO PAY"),
         ("AIRTEL PAY", "AIRTEL PAY"),
         ("INVOICE", "INVOICE"),
+        ("ON ACCOMMODATION", "ON ACCOMMODATION"),
     )
     random_id = models.CharField(max_length=6, unique=True, editable=False, default=generate_random_id)
     customer_name = models.CharField(max_length=255, blank=True, null=True, default="Customer")

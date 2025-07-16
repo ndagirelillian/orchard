@@ -6,7 +6,7 @@ from decimal import Decimal
 from inventory.models import OrderTransaction
 from room_bookings.models import RoomReservation, Sauna_services, SaunaUser
 from otherPackages.models import OtherPackage
-
+from django.db.models.signals import post_save, pre_save
 @receiver(post_save, sender=OrderTransaction)
 def create_revenue_from_order(sender, instance, created, **kwargs):
     if instance.payment_mode != "NO PAYMENT":
@@ -40,30 +40,60 @@ def add_revenue_on_check_in(sender, instance, created, **kwargs):
             )
 
 
+# Temporarily store old value
+@receiver(pre_save, sender=SaunaUser)
+def store_previous_payment_mode(sender, instance, **kwargs):
+    if instance.pk:
+        try:
+            previous = SaunaUser.objects.get(pk=instance.pk)
+            instance._old_payment_mode = previous.payment_mode
+        except SaunaUser.DoesNotExist:
+            instance._old_payment_mode = None
+
+
 @receiver(post_save, sender=SaunaUser)
 def add_revenue_on_sauna_payment(sender, instance, created, **kwargs):
-    """Signal receiver to create Revenue entry when a SaunaUser is added (i.e., customer pays)."""
-    if created:
+    """
+    Signal to create Revenue when SaunaUser pays,
+    excluding 'NO PAYMENT' and 'ON_ACCOMMODATION'.
+    Also works when payment_mode changes from a non-paying mode to a paying mode.
+    """
+    non_payment_modes = ["NO PAYMENT", "ON ACCOMMODATION"]
+
+    # When newly created and is a paying mode
+    if created and instance.payment_mode not in non_payment_modes:
         Revenue.objects.create(
-            category='sauna',  # ✅ FIXED: match Revenue.REVENUE_CHOICES
+            category='sauna',
             description=f"Sauna Service: {instance.service.name} for {instance.customer_name}",
             amount=instance.price or instance.service.price,
             received_from=instance.customer_name,
             date=instance.order_date.date() if instance.order_date else timezone.now().date(),
             created_by=instance.created_by,
         )
-        
-@receiver(post_save, sender=OtherPackage)
-def add_revenue_on_service_completion(sender, instance, created, **kwargs):
-    if instance:
-        # Avoid duplicate revenue entries
-        description = f"{instance.get_service_type_display()} - {instance.client_name} - {instance.id}"
-        if not Revenue.objects.filter(description=description).exists():
+
+    # When payment_mode was changed from non-payment to a paying mode
+    elif not created:
+        old_mode = getattr(instance, "_old_payment_mode", None)
+        if old_mode in non_payment_modes and instance.payment_mode not in non_payment_modes:
             Revenue.objects.create(
-                category='other',
-                description=description,
-                amount=instance.total_amount,
-                received_from=instance.client_name,
-                date=timezone.now().date(),
+                category='sauna',
+                description=f"Sauna Service (Updated): {instance.service.name} for {instance.customer_name}",
+                amount=instance.price or instance.service.price,
+                received_from=instance.customer_name,
+                date=instance.order_date.date() if instance.order_date else timezone.now().date(),
                 created_by=instance.created_by,
             )
+
+
+@receiver(post_save, sender=OtherPackage)
+def add_revenue_on_service_completion(sender, instance, created, **kwargs):
+    if created:
+        description = f"{instance.get_service_type_display()} - {instance.client_name} - {instance.id} - Initial Payment"
+        Revenue.objects.create(
+            category='other',
+            description=description,
+            amount=instance.amount_paid,
+            received_from=instance.client_name,
+            date=timezone.now().date(),
+            created_by=instance.created_by,
+        )

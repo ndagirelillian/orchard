@@ -17,6 +17,8 @@ class OtherPackage(models.Model):
         ('Sauna', 'Sauna Session'),
         ('Spa', 'Spa Treatment'),
         ('WiFi', 'High-Speed Wi-Fi'),
+        ('Event', 'Event Booking'),
+        ('Birthday', 'Birthday Party'),
     ]
 
 
@@ -29,13 +31,24 @@ class OtherPackage(models.Model):
     client_name = models.CharField(max_length=200)
     service_type = models.CharField(max_length=50, choices=SERVICE_TYPES)
     description = models.TextField(blank=True, null=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+
+        # Always calculate balance from total and paid
+        if self.total_amount is not None and self.amount_paid is not None:
+            self.balance = self.total_amount - self.amount_paid
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.client_name} - {self.get_service_type_display()}"

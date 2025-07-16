@@ -31,7 +31,8 @@ class SaunaUserForm(forms.ModelForm):
             'customer_name',
             'gender',
             'service',
-            'keys'
+            'keys',
+           
         ]
         widgets = {
             'customer_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -39,6 +40,20 @@ class SaunaUserForm(forms.ModelForm):
             'service': forms.Select(attrs={'class': 'form-control'}),
             'keys': forms.Select(attrs={'class': 'form-control'}),
         }
+        
+
+class SaunaTransactionPaymentForm(forms.ModelForm):
+    class Meta:
+        model = SaunaUser
+        fields = ['payment_mode', 'transaction_id']
+        widgets = {
+            'payment_mode': forms.Select(attrs={'class': 'form-control'}),
+            'transaction_id': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Leave Blank if Cash Payment'
+            }),
+        }
+
 
 
 class RoomReservationForm(forms.ModelForm):
