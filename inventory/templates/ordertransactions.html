@@ -45,7 +45,7 @@
                 <tbody>
                     {% for order in orders_list %}
                     
-                    {% if order.payment_mode == "NO PAYMENT" or order.payment_mode == "ON ACCOMMODATION" %}
+                    {% if order.payment_mode == "NO PAYMENT"  %}
    
                     <tr>
                         <td>{{ order.random_id }}</td>
@@ -132,7 +132,7 @@
               <option value="CASH">Cash</option>
               <option value="MOMO PAY">Momo Pay</option>
               <option value="AIRTEL PAY">Airtel Pay</option>
-              <option value="ON_ACCOMMODATION">On Accomomodation</option>
+              <option value="ON ACCOMMODATION">On Accomomodation</option>
               <option value="INVOICE">Invoice</option>
             </select>
           </div>

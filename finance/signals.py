@@ -7,12 +7,15 @@ from inventory.models import OrderTransaction
 from room_bookings.models import RoomReservation, Sauna_services, SaunaUser
 from otherPackages.models import OtherPackage
 from django.db.models.signals import post_save, pre_save
+
+
 @receiver(post_save, sender=OrderTransaction)
 def create_revenue_from_order(sender, instance, created, **kwargs):
-    if instance.payment_mode != "NO PAYMENT":
+    if created and instance.payment_mode not in ["NO PAYMENT", "ON ACCOMMODATION", "INVOICES"]:
         # Prevent duplicates: only create if no existing revenue for this order
         if not Revenue.objects.filter(description__icontains=f"Order {instance.random_id}").exists():
-            total_amount = sum(item.total_price for item in instance.order_items.all())
+            total_amount = sum(
+                item.total_price for item in instance.order_items.all())
 
             Revenue.objects.create(
                 category='fnb',
@@ -22,8 +25,6 @@ def create_revenue_from_order(sender, instance, created, **kwargs):
                 date=timezone.now().date(),
                 created_by=instance.created_by,
             )
-
-
 @receiver(post_save, sender=RoomReservation)
 def add_revenue_on_check_in(sender, instance, created, **kwargs):
     if instance.status != "Pending" and instance.status != "Cancelled":

@@ -127,6 +127,7 @@ def add_sauna(request):
 @login_required(login_url='/user/login/')
 def sauna_customers(request):
 
+
     sauna_list = SaunaUser.objects.all().select_related(
         'service', 'created_by').order_by('-order_date')
     paginator = Paginator(sauna_list, 10)
@@ -143,7 +144,7 @@ def sauna_customers(request):
 @login_required
 def SaunaclearedTransactions(request):
     sauna_list = SaunaUser.objects.filter(
-        payment_mode__in=["CASH", "MOMO PAY", "AIRTEL PAY"]).order_by('-id')
+        payment_mode__in=["CASH", "MOMO PAY", "AIRTEL PAY", "ON ACCOMMODATION"]).order_by('-id')
     page = request.GET.get('page')
     sauna_page = Paginator(sauna_list, 10).get_page(page)
     return render(request, "cleared_Sauna.html", {"sauna_list": sauna_page})
@@ -276,71 +277,71 @@ def roomBooking(request):
     })
 
 
-def create_booking(request):
-    if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            booking = form.save(commit=False)
-
-            # Additional validation
-            if booking.check_in >= booking.check_out:
-                messages.error(
-                    request, "Check-out date must be after check-in date")
-                return redirect('room_booking')
-
-            if booking.guests > booking.room.capacity:
-                messages.error(
-                    request, "Number of guests exceeds room capacity")
-                return redirect('room_booking')
-
-            # Check room availability
-            overlapping_bookings = Booking.objects.filter(
-                room=booking.room,
-                check_in__lt=booking.check_out,
-                check_out__gt=booking.check_in
-            ).exists()
-
-            if overlapping_bookings:
-                messages.error(
-                    request, "Room is not available for the selected dates")
-                return redirect('room_booking')
-
-            booking.save()
-
-            # ✅ Send email to multiple recipients
-            subject = 'New Room Booking Notification'
-            message = (
-                f"A new booking has been made:\n\n"
-                f"Name: {booking.first_name}\n"
-                f"Email: {booking.email}\n"
-                f"Room: {booking.room}\n"
-                f"Check-in: {booking.check_in}\n"
-                f"Check-out: {booking.check_out}\n"
-                f"Guests: {booking.guests}"
-            )
-            recipient_list = [
-                'lillygires20@gmail.com',
-                'ndagirelillian15@gmail.com',
-                'orchardmotel01@gmail.com',
-                'brian6mugisha@gmail.com'
-            ]  # Add as many as you need
-
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
-                      recipient_list, fail_silently=False)
-
-            messages.success(
-                request, "Booking created successfully! We will contact you by email in a short time.")
-            return redirect('room_booking')
-        else:
-            # Form has errors
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
-    return redirect('room_booking')
-
-
-
 # def create_booking(request):
+#     if request.method == 'POST':
+#         form = BookingForm(request.POST)
+#         if form.is_valid():
+#             booking = form.save(commit=False)
+
+#             # Additional validation
+#             if booking.check_in >= booking.check_out:
+#                 messages.error(
+#                     request, "Check-out date must be after check-in date")
+#                 return redirect('room_booking')
+
+#             if booking.guests > booking.room.capacity:
+#                 messages.error(
+#                     request, "Number of guests exceeds room capacity")
+#                 return redirect('room_booking')
+
+#             # Check room availability
+#             overlapping_bookings = Booking.objects.filter(
+#                 room=booking.room,
+#                 check_in__lt=booking.check_out,
+#                 check_out__gt=booking.check_in
+#             ).exists()
+
+#             if overlapping_bookings:
+#                 messages.error(
+#                     request, "Room is not available for the selected dates")
+#                 return redirect('room_booking')
+
+#             booking.save()
+
+#             # ✅ Send email to multiple recipients
+#             subject = 'New Room Booking Notification'
+#             message = (
+#                 f"A new booking has been made:\n\n"
+#                 f"Name: {booking.first_name}\n"
+#                 f"Email: {booking.email}\n"
+#                 f"Room: {booking.room}\n"
+#                 f"Check-in: {booking.check_in}\n"
+#                 f"Check-out: {booking.check_out}\n"
+#                 f"Guests: {booking.guests}"
+#             )
+#             recipient_list = [
+#                 'lillygires20@gmail.com',
+#                 'ndagirelillian15@gmail.com',
+#                 'orchardmotel01@gmail.com',
+#                 'brian6mugisha@gmail.com'
+#             ]  # Add as many as you need
+
+#             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
+#                       recipient_list, fail_silently=False)
+
+#             messages.success(
+#                 request, "Booking created successfully! We will contact you by email in a short time.")
+#             return redirect('room_booking')
+#         else:
+#             # Form has errors
+#             for field, errors in form.errors.items():
+#                 for error in errors:
+#                     messages.error(request, f"{field}: {error}")
+#     return redirect('room_booking')
+
+
+
+def create_booking(request):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():

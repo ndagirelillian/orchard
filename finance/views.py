@@ -328,31 +328,41 @@ def liabities(request):
 
 @login_required(login_url='/user/login/')
 def revenue(request):
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
     category = request.GET.get('category')
 
     revenues = Revenue.objects.filter(is_active=True)
 
-    if start_date:
-        revenues = revenues.filter(date__gte=start_date)
-    if end_date:
-        revenues = revenues.filter(date__lte=end_date)
+    # Safely parse start_date
+    if start_date_str not in [None, '', 'None']:
+        try:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+            revenues = revenues.filter(date__gte=start_date)
+        except ValueError:
+            start_date_str = None  # Or show a message
+
+    # Safely parse end_date
+    if end_date_str not in [None, '', 'None']:
+        try:
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+            revenues = revenues.filter(date__lte=end_date)
+        except ValueError:
+            end_date_str = None  # Or show a message
+
     if category:
         revenues = revenues.filter(category=category)
 
     total_revenue = revenues.aggregate(Sum('amount'))['amount__sum'] or 0
 
-    # Paginate if needed
-    from django.core.paginator import Paginator
     paginator = Paginator(revenues.order_by('-date'), 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'revenue_list': page_obj,
-        'start_date': start_date,
-        'end_date': end_date,
+        'start_date': start_date_str,
+        'end_date': end_date_str,
         'selected_category': category,
         'total_revenue': total_revenue,
         'revenue_choices': Revenue.REVENUE_CHOICES,

@@ -22,7 +22,7 @@
                             <th>Customer</th>
                             <th>Created By</th>
                             <th>Order Date</th>
-                            <th>Payment Status</th>
+                            <th>Payment Mode</th>
                             <th>Transaction ID</th>
                             <th>Action</th>
                         </tr>
@@ -39,7 +39,7 @@
                                     <td>{{ order.customer_name }}</td>
                                     <td>{{ order.created_by }}</td>
                                     <td>{{ order.created }}</td>
-                                    <td class="text-success fw-semibold">Paid</td>
+                                    <td >{{ order.payment_mode }}</td>
                                     <td>{{ order.transaction_id }}</td>
                                     
                         

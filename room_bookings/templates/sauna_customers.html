@@ -35,7 +35,7 @@
           </thead>
           <tbody>
             {% for saunacustomer in sauna_list %}
-            {% if saunacustomer.payment_mode == "NO PAYMENT" or saunacustomer.payment_mode == "ON ACCOMMODATION" %}
+            {% if saunacustomer.payment_mode == "NO PAYMENT"  %}
    
                 
             <tr>
@@ -45,7 +45,7 @@
               <td>{{ saunacustomer.service }}</td>
               <td>{{ saunacustomer.keys }}</td>
               <td>{{ saunacustomer.order_date }}</td>
-              <td>{{ saunacustomer.payment_mode }}</td>
+              <td class="text-danger fw-semibold">Not Paid</td>
               <td>
                 <a href="/room_bookings/get_sauna_customer/{{ saunacustomer.id }}" class="btn btn-primary btn-sm">
                   View
@@ -120,8 +120,7 @@
               <option value="CASH">Cash</option>
               <option value="MOMO PAY">Momo Pay</option>
               <option value="AIRTEL PAY">Airtel Pay</option>
-              <option value="INVOICE">Invoice</option>
-              <option value="ON_ACCOMMODATION">On Accommodation</option>
+              <option value="ON ACCOMMODATION">On Accommodation</option>
             </select>
           </div>
           <div class="form-group mt-3">
