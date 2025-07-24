@@ -127,8 +127,7 @@ def add_sauna(request):
 @login_required(login_url='/user/login/')
 def sauna_customers(request):
 
-
-    sauna_list = SaunaUser.objects.all().select_related(
+    sauna_list = SaunaUser.objects.filter(payment_mode="NO PAYMENT").select_related(
         'service', 'created_by').order_by('-order_date')
     paginator = Paginator(sauna_list, 10)
 
