@@ -7,4 +7,5 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("menu/", views.menu, name="menu"),
     path("foods/<str:id>", views.food_filter, name="menu"),
+    path("policy/", views.policy, name="policy"),
 ]

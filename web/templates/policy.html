@@ -1,0 +1,650 @@
+
+
+{% block content %}
+<div>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Policies & Terms of Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #68cd74;
+            background: linear-gradient(135deg, #73ea66 0%, #789e74 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(100, 227, 8, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #7ad271 0%, #58ac55 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .nav-tab.active {
+            color: #2c3e50;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #7ac27e, #456440);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-top: 3px solid #667eea;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+
+        .contact-info strong {
+            margin-right: 10px;
+            min-width: 80px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .effective-date {
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tab {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏨 |Orchard Motel</h1>
+            <p>Your Comfort, Our Commitment</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('privacy')">Privacy Policy</button>
+            <button class="nav-tab" onclick="showTab('terms')">Terms of Service</button>
+            <button class="nav-tab" onclick="showTab('support')">Customer Support</button>
+        </div>
+
+        <div class="content">
+            <div class="effective-date">
+                <strong>Effective Date:</strong> 21-Aug-2009 | <strong>Last Updated:</strong> 21-Aug-2025
+            </div>
+
+            <!-- Privacy Policy Tab -->
+            <div id="privacy" class="tab-content active">
+                <h2>Privacy Policy</h2>
+                
+                <div class="highlight-box">
+                    <p><strong>Orchard Motel</strong> values your privacy and is committed to protecting your personal information. This policy explains how we collect, use, and safeguard your data when you use our accommodation, restaurant, sauna, and massage services.</p>
+                </div>
+
+                <div class="section">
+                    <h3>📋 Information We Collect</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Personal Information</h4>
+                            <ul>
+                                <li>Name, address, phone number</li>
+                                <li>Email address</li>
+                                <li>Payment details</li>
+                                <li>Identification documents</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Booking & Stay Information</h4>
+                            <ul>
+                                <li>Room preferences</li>
+                                <li>Check-in/check-out details</li>
+                                <li>Special requests</li>
+                                <li>Service history</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Service Preferences</h4>
+                            <ul>
+                                <li>Dietary preferences</li>
+                                <li>Wellness treatment history</li>
+                                <li>Accessibility needs</li>
+                                <li>Communication preferences</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Technical Information</h4>
+                            <ul>
+                                <li>IP address</li>
+                                <li>Device type and browser</li>
+                                <li>Cookies (for online bookings)</li>
+                                <li>Website usage data</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🔧 How We Use Your Information</h3>
+                    <ul>
+                        <li><strong>Service Delivery:</strong> Process reservations, payments, and service requests</li>
+                        <li><strong>Personalization:</strong> Enhance customer experience and tailor services to your preferences</li>
+                        <li><strong>Communication:</strong> Send booking confirmations, service updates, and promotional offers (with your consent)</li>
+                        <li><strong>Legal Compliance:</strong> Meet legal obligations and security requirements</li>
+                        <li><strong>Quality Improvement:</strong> Analyze service usage to improve our offerings</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🤝 Data Sharing</h3>
+                    <p><strong>We do not sell your personal information.</strong> We may share limited data with:</p>
+                    <ul>
+                        <li><strong>Payment Processors:</strong> Secure transaction processing</li>
+                        <li><strong>Service Providers:</strong> Trusted partners (laundry services, IT systems, maintenance)</li>
+                        <li><strong>Legal Authorities:</strong> When required by law or to protect safety</li>
+                        <li><strong>Emergency Services:</strong> In case of medical or safety emergencies</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🔒 Data Security</h3>
+                    <p>We implement industry-standard security measures including:</p>
+                    <ul>
+                        <li>Encryption of sensitive data</li>
+                        <li>Secure payment processing systems</li>
+                        <li>Regular security audits and updates</li>
+                        <li>Access controls and staff training</li>
+                        <li>Secure data storage and transmission</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>👤 Your Rights</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Access Rights</h4>
+                            <p>Request a copy of your personal data we hold</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Correction Rights</h4>
+                            <p>Update or correct any inaccurate information</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Consent Management</h4>
+                            <p>Withdraw marketing consent at any time</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Deletion Rights</h4>
+                            <p>Request deletion where legally applicable</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms of Service Tab -->
+            <div id="terms" class="tab-content">
+                <h2>Terms of Service</h2>
+                
+                <div class="highlight-box">
+                    <p>By booking accommodation, dining at our restaurant, or using our wellness facilities at <strong>[Hotel Name]</strong>, you agree to these terms and conditions.</p>
+                </div>
+
+                <div class="section">
+                    <h3>🏨 Reservations & Check-in</h3>
+                    <ul>
+                        <li><strong>Required Documentation:</strong> Valid government-issued ID and payment method required at check-in</li>
+                        <li><strong>Check-in Time:</strong> Standard check-in from 3:00 PM, early check-in subject to availability and charges</li>
+                        <li><strong>Check-out Time:</strong> 11:00 AM standard, late check-out available with prior arrangement</li>
+                        <li><strong>Cancellation Policy:</strong> Cancellations must follow our published policy; no-shows may incur charges</li>
+                        <li><strong>Age Requirements:</strong> Guests under 18 must be accompanied by a parent or guardian</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🤝 Guest Responsibilities</h3>
+                    <ul>
+                        <li><strong>Respectful Conduct:</strong> Treat hotel property, staff, and other guests with courtesy and respect</li>
+                        <li><strong>Prohibited Activities:</strong> No illegal, disruptive, or unsafe behavior permitted</li>
+                        <li><strong>Property Damage:</strong> Guests are financially responsible for any damages or losses to hotel property</li>
+                        <li><strong>Noise Policy:</strong> Maintain reasonable noise levels, especially during quiet hours (10 PM - 8 AM)</li>
+                        <li><strong>Safety Compliance:</strong> Follow all safety instructions and emergency procedures</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🛏️ Accommodation Terms</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Occupancy Limits</h4>
+                            <p>Room occupancy limited to registered guests only. Additional guests require prior approval and may incur extra charges.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Smoking Policy</h4>
+                            <p>Smoking prohibited in all indoor areas. Designated outdoor smoking areas available.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Pet Policy</h4>
+                            <p>Pets allowed only in designated pet-friendly rooms with advance booking and additional fees.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Key Card Security</h4>
+                            <p>Lost key cards incur replacement fees. Report lost cards immediately for security.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🍽️ Restaurant Services</h3>
+                    <ul>
+                        <li><strong>Dietary Requirements:</strong> Inform staff of allergies, dietary restrictions, or special needs</li>
+                        <li><strong>Outside Food Policy:</strong> External food and beverages not permitted in restaurant areas</li>
+                        <li><strong>Dress Code:</strong> Smart casual attire required for dinner service</li>
+                        <li><strong>Reservations:</strong> Advance booking recommended for restaurant dining</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🧘 Wellness Services (Sauna & Massage)</h3>
+                    <ul>
+                        <li><strong>Advance Booking:</strong> Appointments must be scheduled in advance</li>
+                        <li><strong>Medical Disclosure:</strong> Inform staff of medical conditions, injuries, or health concerns</li>
+                        <li><strong>Age Restrictions:</strong> Minimum age requirements apply for certain treatments</li>
+                        <li><strong>Cancellation Policy:</strong> 24-hour cancellation notice required to avoid charges</li>
+                        <li><strong>Appropriate Conduct:</strong> Professional, respectful behavior required at all times</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>💳 Payment Terms</h3>
+                    <ul>
+                        <li><strong>Payment Methods:</strong> Cash, credit cards, and approved electronic payments accepted</li>
+                        <li><strong>Settlement:</strong> All charges must be settled at check-out unless pre-authorized</li>
+                        <li><strong>Currency:</strong> All prices quoted in local currency unless specified otherwise</li>
+                        <li><strong>Incidental Charges:</strong> Additional services will be charged to your account</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>⚖️ Liability & Disclaimers</h3>
+                    <ul>
+                        <li><strong>Valuables:</strong> Hotel not liable for loss of personal items unless stored in hotel safe</li>
+                        <li><strong>Facility Use:</strong> Use of all facilities at guest's own risk unless negligence is proven</li>
+                        <li><strong>Force Majeure:</strong> Hotel not liable for delays or cancellations due to circumstances beyond our control</li>
+                        <li><strong>Medical Emergencies:</strong> Hotel will assist but is not responsible for medical costs</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🚫 Service Termination</h3>
+                    <p>The hotel reserves the right to refuse service or remove any guest who violates these terms, without refund. This includes but is not limited to:</p>
+                    <ul>
+                        <li>Disruptive or inappropriate behavior</li>
+                        <li>Damage to property</li>
+                        <li>Violation of safety regulations</li>
+                        <li>Non-payment of charges</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Customer Support Tab -->
+            <div id="support" class="tab-content">
+                <h2>Customer Support</h2>
+                
+                <div class="highlight-box">
+                    <p>At <strong>[Hotel Name]</strong>, we're committed to providing exceptional support throughout your entire stay experience.</p>
+                </div>
+
+                <div class="section">
+                    <h3>🏨 24/7 Front Desk Support</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Available Services</h4>
+                            <ul>
+                                <li>Check-in/check-out assistance</li>
+                                <li>Booking modifications</li>
+                                <li>Lost & found services</li>
+                                <li>Emergency assistance</li>
+                                <li>Local area information</li>
+                                <li>Transportation arrangements</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Concierge Services</h4>
+                            <ul>
+                                <li>Restaurant recommendations</li>
+                                <li>Event tickets and bookings</li>
+                                <li>Local tours and activities</li>
+                                <li>Shopping assistance</li>
+                                <li>Business services</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🍽️ Restaurant Support</h3>
+                    <ul>
+                        <li><strong>Reservation Management:</strong> Table bookings, cancellations, and special requests</li>
+                        <li><strong>Dietary Accommodations:</strong> Special menus for allergies, dietary restrictions, and preferences</li>
+                        <li><strong>Event Catering:</strong> Private dining and special occasion arrangements</li>
+                        <li><strong>Feedback Handling:</strong> Immediate response to dining experience concerns</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>🧘 Wellness Services Support</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Appointment Management</h4>
+                            <ul>
+                                <li>Online booking system</li>
+                                <li>Phone reservations</li>
+                                <li>Same-day availability</li>
+                                <li>Group bookings</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Cancellation Policy</h4>
+                            <ul>
+                                <li>24-hour advance notice required</li>
+                                <li>No-show charges apply</li>
+                                <li>Emergency cancellations considered</li>
+                                <li>Rescheduling options available</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>💬 Feedback & Complaints Resolution</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>How to Provide Feedback</h4>
+                            <ul>
+                                <li>In-person at reception</li>
+                                <li>Email to our support team</li>
+                                <li>Online feedback form</li>
+                                <li>Phone during business hours</li>
+                                <li>Post-stay survey</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Our Commitment</h4>
+                            <ul>
+                                <li>48-hour response guarantee</li>
+                                <li>Manager involvement for serious issues</li>
+                                <li>Follow-up to ensure satisfaction</li>
+                                <li>Continuous improvement process</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🚨 Emergency Support</h3>
+                    <ul>
+                        <li><strong>Medical Emergencies:</strong> Immediate contact with local medical services</li>
+                        <li><strong>Security Issues:</strong> 24/7 security personnel and local law enforcement coordination</li>
+                        <li><strong>Fire Safety:</strong> Automated systems and trained staff response</li>
+                        <li><strong>Natural Disasters:</strong> Emergency protocols and evacuation procedures</li>
+                        <li><strong>Personal Emergencies:</strong> Assistance with family notifications and travel arrangements</li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3>📞 Contact Information</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Primary Contact</h4>
+                            <div class="contact-info">
+                                <strong>Phone:</strong> [Insert Phone Number]
+                            </div>
+                            <div class="contact-info">
+                                <strong>Email:</strong> [Insert Support Email]
+                            </div>
+                            <div class="contact-info">
+                                <strong>Address:</strong> [Insert Hotel Address]
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <h4>Department-Specific</h4>
+                            <div class="contact-info">
+                                <strong>Reservations:</strong> [Insert Reservations Email]
+                            </div>
+                            <div class="contact-info">
+                                <strong>Wellness Spa:</strong> [Insert Spa Email]
+                            </div>
+                            <div class="contact-info">
+                                <strong>Restaurant:</strong> [Insert Restaurant Email]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>⏰ Support Hours</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>24/7 Services</h4>
+                            <ul>
+                                <li>Front desk reception</li>
+                                <li>Emergency assistance</li>
+                                <li>Security services</li>
+                                <li>Basic concierge</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Business Hours Services</h4>
+                            <ul>
+                                <li>Management consultations</li>
+                                <li>Detailed concierge services</li>
+                                <li>Administrative support</li>
+                                <li>Group bookings</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>
+</div>
+{% endblock %}

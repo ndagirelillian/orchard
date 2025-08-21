@@ -5,8 +5,11 @@ from inventory.models import Category, MenuItem
 # Create your views here.
 def home(request):
     dishes = Category.objects.order_by('?')[:12]
-    foods = MenuItem.objects.order_by('?')[:3]
+    foods = MenuItem.objects.order_by('?')[:12]
     return render(request, "home.html", {"dishes": dishes, "foods": foods})
+
+def policy(request):
+    return render(request, "policy.html")
 
 
 def menu(request):

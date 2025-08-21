@@ -1,8 +1,5 @@
-<!--
-Author: W3layouts
-Author URL: http://w3layouts.com
--->
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 {% load static %}
 <head>
@@ -16,7 +13,331 @@ Author URL: http://w3layouts.com
     <!-- //google-fonts -->
     <!-- Template CSS Style link -->
     <link rel="stylesheet" href="{% static 'assets/css/style-starter.css' %}">
-</head>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 50px 0;
+            text-align: center;
+            color: #2c3e30;
+        }
+
+        /* Footer Styles */
+        #about {
+            background: linear-gradient(135deg, #1e3a2e 0%, #2c5f41 50%, #1a3329 100%);
+            color: #e8f5e8;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(46, 125, 50, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(76, 175, 80, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Logo Section */
+        .footer-logo {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo-2 {
+            color: #a8d5a8;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .logo-2:hover {
+            color: #c8e6c9;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .logo-2 i {
+            margin-left: 15px;
+            color: #81c784;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* Contact Header */
+        .contact-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(129, 199, 132, 0.3);
+        }
+
+        .contact-title {
+            color: #a8d5a8;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Social Media */
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            background: rgba(129, 199, 132, 0.15);
+            border: 2px solid rgba(129, 199, 132, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a8d5a8;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .social-links a:hover {
+            background: #388e3c;
+            border-color: #66bb6a;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(56, 142, 60, 0.4);
+        }
+
+        /* Main Footer Content */
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-section h5 {
+            color: #c8e6c9;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .footer-section h5::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #66bb6a, transparent);
+        }
+
+        .footer-section p {
+            color: #b8d8b8;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* Links */
+        .support-links {
+            list-style: none;
+        }
+
+        .support-links li {
+            margin-bottom: 12px;
+        }
+
+        .support-links a {
+            color: #b8d8b8;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .support-links a::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #81c784;
+            transition: all 0.3s ease;
+        }
+
+        .support-links a:hover {
+            color: #e8f5e8;
+            padding-left: 25px;
+        }
+
+        .support-links a:hover::before {
+            color: #a5d6a7;
+        }
+
+        /* Newsletter */
+        .newsletter-form {
+            display: flex;
+            margin: 25px 0;
+            border-radius: 25px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(129, 199, 132, 0.2);
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            color: #e8f5e8;
+            font-size: 1rem;
+        }
+
+        .newsletter-form input::placeholder {
+            color: #b8d8b8;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+        }
+
+        .newsletter-form button {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #388e3c, #66bb6a);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .newsletter-form button:hover {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            transform: scale(1.05);
+        }
+
+        /* Copyright */
+        .copyright-section {
+            border-top: 1px solid rgba(129, 199, 132, 0.2);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .copyright-text {
+            color: #b8d8b8;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .copyright-text a {
+            color: #81c784;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .copyright-text a:hover {
+            color: #a5d6a7;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .footer-nav a {
+            color: #b8d8b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-nav a:hover {
+            color: #e8f5e8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .footer-container {
+                padding: 40px 15px 20px;
+            }
+
+            .logo-2 {
+                font-size: 2rem;
+            }
+
+            .contact-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .copyright-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .footer-nav {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+    </style>
+    </head>
 
 <body>
     <!--header-->
@@ -41,7 +362,7 @@ Author URL: http://w3layouts.com
                             <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">About Us</a>
+                            <a class="nav-link" href="#about">Contact Us</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/menu/">Menu</a>
@@ -77,87 +398,76 @@ Author URL: http://w3layouts.com
         
     {% endblock content %} 
     <!-- footer -->
-    <footer class="w3l-footer-29-main">
-        <div class="footer-29-w3l py-5">
-            <div class="container pt-md-5 pt-4">
-                <div class="w3l-footer-texthny-inf">
-                    <h2>
-                        <a class="d-flex align-items-center logo-2" href="index.html">
-                            Orchard <i class="fa fa-cutlery ml-2" aria-hidden="true"></i></a>
-                    </h2>
-                    <div class="footer-list-cont d-flex align-items-center justify-content-between mt-md-5 mt-4 mb-5">
-                        <h6 class="foot-sub-title">Contact Us</h6>
+<footer id="about">
+        <div class="footer-container">
+            <!-- Logo Section -->
+            <div class="footer-logo">
+                <a class="logo-2" href="index.html">
+                    Orchard <i class="fas fa-utensils"></i>
+                </a>
+            </div>
 
-                        <div class="main-social-footer-29">
-                            <a href="#facebook" class="facebook"><span class="fa fa-facebook"></span></a>
-                            <a href="#twitter" class="twitter"><span class="fa fa-twitter"></span></a>
-                            <a href="#instagram" class="instagram"><span class="fa fa-instagram"></span></a>
-                            <a href="#linkedin" class="linkedin"><span class="fa fa-linkedin"></span></a>
-                        </div>
-                    </div>
+            <!-- Contact Header with Social Links -->
+            <div class="contact-header">
+                <h6 class="contact-title">Connect With Us</h6>
+                <div class="social-links">
+                    <a href="#facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#linkedin" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
-                <div class="row footer-top-29 mt-lg-5 mt-md-4 pt-md-5">
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="address-grid">
-                            <!-- <h5>10001 Alleghany st, 5th Avenue, 235 Terry, <br> London.</h5>
-                            <h5 class="mt-sm-5 mt-4">Everyday: <span> 7 AM - 8 PM</span></h5> -->
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6 mt-sm-0 mt-4">
-                        <div class="address-grid">
-                            <h5>Phone</h5>
-                            <!-- <h5 class="phone-number-text mt-2"><a href="tel:+1(21) 234 4567">+1(21) 112 7368</a></h5> -->
-                        </div>
-                        <div class="address-grid mt-sm-5 mt-4">
-                            <h5>E-mail</h5>
-                            <!-- <h5 class="email-cont-text mt-1"> <a href="mailto:bistros@mail.com"
-                                    class="mail">bistros@mail.com</a></h5> -->
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-5 footer-list-menu pl-lg-0 mt-lg-0 mt-sm-5 mt-4">
-                        <div class="address-grid">
-                            <h5 class="mb-4 pb-lg-2">Support Links</h5>
-                            <ul>
-                                <li><a href="#privacy">Privacy Policy</a></li>
-                                <li><a href="#terms"> Terms of Service</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
-                                <li><a href="#support"> Support</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="address-grid col-lg-4 col-md-6 col-sm-7 mt-lg-0 mt-sm-5 mt-4 w3l-footer-16-main">
-                        <h5>Subscribe Here</h5>
-                        <form action="#" class="subscribe d-flex mt-4 pt-lg-2 mb-4" method="post">
-                            <input type="email" name="email" placeholder="Email Address" required="">
-                            <button><span class="fa fa-paper-plane" aria-hidden="true"></span></button>
-                        </form>
-                        <p>Subscribe to our mailing list and get updates to your email inbox.</p>
-                    </div>
-                </div>
-                <!-- copyright -->
-                <div class="w3l-copyright mt-lg-5 mt-sm-4 pt-md-4 pt-3">
-                    <div class="row bottom-copies pt-md-5 pt-4 mt-md-5 mt-4">
-                        <p class="col-lg-8 copy-footer-29">© 2021 Orchard. All rights reserved. Design by <a
-                                href="#" target="_blank">
-                                Fe</a></p>
+            </div>
 
-                        <div class="col-lg-4 footer-list-29 mt-lg-0 mt-md-4 mt-2">
-                            <ul class="d-flex text-lg-right">
-                                <li><a href="#support"> Support</a></li>
-                                <li class="mx-lg-5 mx-md-4 mx-3"><a href="#privacy">Privacy Policy</a>
-                                </li>
-                                <li><a href="contact.html">Contact Us</a></li>
-                            </ul>
-                        </div>
-                    </div>
+            <!-- Main Footer Content -->
+            <div class="footer-grid">
+                <!-- Contact Information -->
+                <div class="footer-section">
+                    <h5>Contact Information</h5>
+                    <p><i class="fas fa-phone" style="color: #81c784; margin-right: 10px;"></i>+256 773 963560</p>
+                    <p><i class="fas fa-phone" style="color: #81c784; margin-right: 10px;"></i>+256 709 884113</p>
+                    <p><i class="fas fa-envelope" style="color: #81c784; margin-right: 10px;"></i>orchardmotel01@gmail.com</p>
                 </div>
+
+                <!-- Support Links -->
+                <div class="footer-section">
+                    <h5>Quick Links</h5>
+                    <ul class="support-links">
+                        <li><a href="/policy/">Privacy Policy</a></li>
+                        <li><a href="/policy/">Terms of Service</a></li>
+                        <li><a href="">Contact Us</a></li>
+                        <li><a href="/policy/">Support Center</a></li>
+                        <li><a href="">About Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="footer-section">
+                    <h5>Stay Updated</h5>
+                    <p>Subscribe to our newsletter for the latest updates, special offers, and delicious news from Orchard.</p>
+                    <form class="newsletter-form" method="post">
+                        <input type="email" name="email" placeholder="Enter your email address" required>
+                        <button type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Copyright Section -->
+            <div class="copyright-section">
+                <p class="copyright-text">
+                    © 2024 Orchard Restaurant. All rights reserved. 
+                    <br class="d-md-none">Designed by <a href="#" target="_blank">Digital Chronicles</a>
+                </p>
+                <ul class="footer-nav">
+                    <li><a href="#support">Support</a></li>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
             </div>
         </div>
     </footer>
-    <!-- //footer -->
 
-    <!-- Js scripts -->
-    <!-- move top -->
     <button onclick="topFunction()" id="movetop" title="Go to top">
         <span class="fa fa-level-up" aria-hidden="true"></span>
     </button>
