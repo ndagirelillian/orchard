@@ -4,7 +4,7 @@ from inventory.models import Category, MenuItem
 
 # Create your views here.
 def home(request):
-    dishes = Category.objects.order_by('?')[:12]
+    dishes = Category.objects.order_by('?')[:5]
     foods = MenuItem.objects.order_by('?')[:12]
     return render(request, "home.html", {"dishes": dishes, "foods": foods})
 

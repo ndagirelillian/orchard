@@ -6,13 +6,32 @@ from decimal import Decimal
 from inventory.models import OrderTransaction
 from room_bookings.models import RoomReservation, Sauna_services, SaunaUser
 from otherPackages.models import OtherPackage
-from django.db.models.signals import post_save, pre_save
+
+from django.db.models.signals import pre_save, post_save
+
+# Temporary storage to track changes
+_previous_payment_modes = {}
+
+
+@receiver(pre_save, sender=OrderTransaction)
+def track_previous_payment_mode(sender, instance, **kwargs):
+    if instance.pk:
+        old_instance = OrderTransaction.objects.get(pk=instance.pk)
+        _previous_payment_modes[instance.pk] = old_instance.payment_mode
 
 
 @receiver(post_save, sender=OrderTransaction)
 def create_revenue_from_order(sender, instance, created, **kwargs):
-    if created and instance.payment_mode not in ["NO PAYMENT", "ON ACCOMMODATION", "INVOICES"]:
-        # Prevent duplicates: only create if no existing revenue for this order
+    excluded_modes = ["NO PAYMENT", "ON ACCOMMODATION", "INVOICE"]
+    allowed_modes = ["CASH", "MOMO PAY", "AIRTEL PAY"]
+
+    if created:
+        return  # Don't act on creation because it's always "NO PAYMENT"
+
+    previous_mode = _previous_payment_modes.get(instance.pk)
+
+    # Only trigger if payment_mode changed and new mode is allowed
+    if previous_mode != instance.payment_mode and instance.payment_mode in allowed_modes:
         if not Revenue.objects.filter(description__icontains=f"Order {instance.random_id}").exists():
             total_amount = sum(
                 item.total_price for item in instance.order_items.all())
@@ -25,6 +44,28 @@ def create_revenue_from_order(sender, instance, created, **kwargs):
                 date=timezone.now().date(),
                 created_by=instance.created_by,
             )
+
+    # Clean up
+    _previous_payment_modes.pop(instance.pk, None)
+
+
+
+# @receiver(post_save, sender=OrderTransaction)
+# def create_revenue_from_order(sender, instance, created, **kwargs):
+#     if created and instance.payment_mode not in ["NO PAYMENT", "ON ACCOMMODATION", "INVOICES"]:
+#         # Prevent duplicates: only create if no existing revenue for this order
+#         if not Revenue.objects.filter(description__icontains=f"Order {instance.random_id}").exists():
+#             total_amount = sum(
+#                 item.total_price for item in instance.order_items.all())
+
+#             Revenue.objects.create(
+#                 category='fnb',
+#                 description=f"F&B Payment for Order {instance.random_id}",
+#                 amount=Decimal(total_amount),
+#                 received_from=instance.customer_name or "walk-in",
+#                 date=timezone.now().date(),
+#                 created_by=instance.created_by,
+#             )
 @receiver(post_save, sender=RoomReservation)
 def add_revenue_on_check_in(sender, instance, created, **kwargs):
     if instance.status != "Pending" and instance.status != "Cancelled":
