@@ -40,7 +40,7 @@
                                 <tr>
                                     <td>{{ item.menu_item.name }}</td>
                                     <td>{{ item.quantity }}</td>
-                                    <td>{{ item.menu_item.price|intcomma }}</td>
+                                    <td>{{ item.unit_price|intcomma }}</td>
                                     <td>{{ item.total_price|intcomma }}</td>
                                 </tr>
                                 {% endfor %}

@@ -112,6 +112,7 @@ class RoomReservation(models.Model):
     status = models.CharField(max_length=20, choices=RESERVATION_STATUS_CHOICES, default='Pending')
     special_requests = models.TextField(blank=True, null=True)
     created_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    booked_price_per_night = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
 
     def __str__(self):
@@ -126,8 +127,8 @@ class RoomReservation(models.Model):
         return self.check_in_date <= timezone.now().date() <= self.check_out_date
 
     def calculate_total_price(self):
-        if self.room.price_per_night and self.total_nights > 0:
-            return self.total_nights * self.room.price_per_night
+        if self.booked_price_per_night is not None and self.total_nights > 0:
+            return self.total_nights * self.booked_price_per_night
         return 0
 
     def clean(self):
@@ -156,6 +157,11 @@ class RoomReservation(models.Model):
         # Assign a unique 9-digit reservation ID if not set
         if not self.reservation_id or self.reservation_id < 100000000:
             self.reservation_id = random.randint(100000000, 999999999)
+
+        if self.booked_price_per_night is None:
+            self.booked_price_per_night = Decimal(
+                str(self.room.price_per_night or 0)
+            )
 
         # Calculate total price
         self.total_price = self.calculate_total_price()

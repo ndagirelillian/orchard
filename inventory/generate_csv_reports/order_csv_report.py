@@ -99,7 +99,7 @@ def export_orders_to_csv(request, time_period='daily'):
                 category_name,
                 item.menu_item.name if item.menu_item else 'N/A',
                 item.quantity,
-                float(item.menu_item.price) if item.menu_item else 0,
+                float(item.unit_price or 0),
                 float(item.total_price),
                 order.payment_mode,
                 order.served_by,

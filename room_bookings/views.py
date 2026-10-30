@@ -22,14 +22,15 @@ def fetch_reservation_details(request, reservation_id):
         "reservation_id": reservation.reservation_id,
         "customer": reservation.customer,
         "reservation_date": reservation.reservation_date,
-        "room_number": reservation.room.room_npyumber,
+        "room_number": reservation.room.room_number,
         "total_nights": reservation.total_nights,
+        "booked_price_per_night": reservation.booked_price_per_night,
         "total_price": reservation.total_price,
         "check_in_date": reservation.check_in_date,
         "check_out_date": reservation.check_out_date,
         "status": reservation.status,
         "special_requests": reservation.special_requests or "None",
-        "created_by": reservation.created_by,
+        "created_by": reservation.created_by.username if reservation.created_by else None,
     }
 
     return JsonResponse(data)
@@ -89,7 +90,11 @@ def add_reservation(request):
     else:
         form = RoomReservationForm()
 
-    return render(request, 'add_reservation.html', {'form': form})
+    room_prices = dict(Room.objects.values_list('id', 'price_per_night'))
+    return render(request, 'add_reservation.html', {
+        'form': form,
+        'room_prices': room_prices,
+    })
 
 #ADD CUSTOMER VIEW
 @login_required(login_url='/user/login/')
@@ -427,6 +432,4 @@ def confirm_booking(request, booking_id):
 def reservation_detail(request, reservation_id):
     reservation = get_object_or_404(RoomReservation, id=reservation_id)
     return render(request, 'reservation_detail.html', {'reservation': reservation})
-
-
 

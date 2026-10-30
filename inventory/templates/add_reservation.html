@@ -78,6 +78,16 @@
                     {% endfor %}
                   </div>
                 </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    {{ form.booked_price_per_night }}
+                    <label for="{{ form.booked_price_per_night.id_for_label }}">{{ form.booked_price_per_night.label }}</label>
+                    <small class="form-text text-muted">Defaults to the room rate; change this reservation's price without changing the room's standard rate.</small>
+                    {% for error in form.booked_price_per_night.errors %}
+                      <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                  </div>
+                </div>
                 <div class="col-md-6 d-flex align-items-center">
                   <div class="bg-light p-3 rounded w-100">
                     <div class="d-flex justify-content-between mb-1">
@@ -85,8 +95,8 @@
                       <strong id="total-nights">0</strong>
                     </div>
                     <div class="d-flex justify-content-between">
-                      <span class="text-muted">Total Price:</span>
-                      <strong id="total-price" class="text-primary">0.00</strong>
+                      <span class="text-muted">Total Price (UGX):</span>
+                      <strong id="total-price" class="text-primary">0</strong>
                     </div>
                   </div>
                 </div>
@@ -124,6 +134,8 @@
   </div>
 </div>
 
+{{ room_prices|json_script:"room-prices" }}
+
 <style>
   .form-floating > label {
     padding: 1rem 1.25rem;
@@ -143,15 +155,20 @@ document.addEventListener('DOMContentLoaded', function () {
   const roomSelect = document.querySelector('[data-bind="room-select"]') || document.querySelector('select[name="room"]');
   const checkInDate = document.getElementById('{{ form.check_in_date.id_for_label }}');
   const checkOutDate = document.getElementById('{{ form.check_out_date.id_for_label }}');
+  const nightlyRate = document.getElementById('{{ form.booked_price_per_night.id_for_label }}');
+  const roomPrices = JSON.parse(document.getElementById('room-prices').textContent);
   
-  function updatePrice() {
-    const pricePerNight = roomSelect?.selectedOptions[0]?.dataset.price || 0;
+  function updatePrice(loadRoomRate = false) {
+    if (loadRoomRate && roomSelect) {
+      nightlyRate.value = roomPrices[roomSelect.value] ?? '';
+    }
+    const pricePerNight = Number(nightlyRate.value) || 0;
     const checkIn = new Date(checkInDate?.value);
     const checkOut = new Date(checkOutDate?.value);
     const nights = Math.ceil((checkOut - checkIn) / (1000 * 3600 * 24)) || 0;
 
     document.getElementById('total-nights').textContent = nights;
-    document.getElementById('total-price').textContent = `$${(pricePerNight * nights).toFixed(2)}`;
+    document.getElementById('total-price').textContent = new Intl.NumberFormat().format(pricePerNight * nights);
   }
 
   checkInDate?.addEventListener('change', function () {
@@ -162,10 +179,11 @@ document.addEventListener('DOMContentLoaded', function () {
     updatePrice();
   });
 
-  checkOutDate?.addEventListener('change', updatePrice);
-  roomSelect?.addEventListener('change', updatePrice);
+  checkOutDate?.addEventListener('change', () => updatePrice());
+  nightlyRate?.addEventListener('input', () => updatePrice());
+  roomSelect?.addEventListener('change', () => updatePrice(true));
 
-  updatePrice();
+  updatePrice(!nightlyRate.value && Boolean(roomSelect?.value));
 });
 </script>
 {% endblock %}

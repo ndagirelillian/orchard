@@ -1,10 +1,12 @@
 import json
 from datetime import datetime, time, timedelta
+from decimal import Decimal, InvalidOperation
 from pyexpat.errors import messages
 
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncMonth
 from django.http import JsonResponse, HttpResponseForbidden
@@ -236,7 +238,9 @@ def add_order(request):
         created__range=(start_utc, end_utc),
         payment_mode="NO PAYMENT"
     ).order_by('-id')
-    menu_items = MenuItem.objects.all().values('id', 'name', 'price')
+    menu_items = MenuItem.objects.filter(is_available=True).values(
+        'id', 'name', 'price', 'category__name'
+    )
     if request.method == 'POST':
         form = OrderTransactionForm(request.POST)
         if form.is_valid():
@@ -250,59 +254,138 @@ def add_order(request):
 
     return render(request, 'add_order.html', {
         'form': form,
-
         'all_menu_items': menu_items,
-        # 'last_transaction_order': last_transaction_order,
         'unpaid_orders': unpaid_orders,
+        'special_note_choices': OrderItem.SPECIAL_NOTES_CHOICES,
     })
 
 
-@csrf_exempt
 @login_required(login_url='/user/login/')
+@require_POST
 def submit_orders(request):
-    if request.method == "POST":
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    if not isinstance(data, dict):
+        return JsonResponse({"error": "Invalid order payload"}, status=400)
+
+    orders = data.get("orders")
+    if not isinstance(orders, list) or not orders:
+        return JsonResponse({"error": "Select at least one menu item"}, status=400)
+
+    order_type = data.get("order_type", "Dine-In")
+    valid_order_types = dict(OrderItem.ORDER_TYPE_CHOICES)
+    if not isinstance(order_type, str) or order_type not in valid_order_types:
+        return JsonResponse({"error": "Invalid order type"}, status=400)
+
+    special_notes = data.get("special_notes", "nothing")
+    valid_notes = dict(OrderItem.SPECIAL_NOTES_CHOICES)
+    if not isinstance(special_notes, str) or special_notes not in valid_notes:
+        return JsonResponse({"error": "Invalid special note"}, status=400)
+
+    quantities = {}
+    submitted_prices = {}
+    for item in orders:
+        if not isinstance(item, dict):
+            return JsonResponse({"error": "Invalid menu item"}, status=400)
         try:
-            data = json.loads(request.body.decode("utf-8"))
-            order_id = data.get("random_id")
-            customer_name = data.get("customer_name")
-            order_type = data.get("order_type")
-            status = data.get("status")
-            special_notes = data.get("special_notes")
-            orders = data.get("orders", [])
+            menu_item_id = int(item.get("menu_item_id"))
+            quantity = int(item.get("quantity"))
+        except (TypeError, ValueError):
+            return JsonResponse({"error": "Menu item and quantity must be integers"}, status=400)
+        if menu_item_id < 1 or quantity < 1:
+            return JsonResponse({"error": "Menu item and quantity must be positive"}, status=400)
+        if "unit_price" in item:
+            try:
+                unit_price = Decimal(str(item["unit_price"]))
+            except (InvalidOperation, TypeError, ValueError):
+                return JsonResponse({"error": "Menu item price is invalid"}, status=400)
+            if (
+                not unit_price.is_finite()
+                or unit_price < 0
+                or unit_price >= Decimal("100000000")
+                or unit_price.as_tuple().exponent < -2
+            ):
+                return JsonResponse({"error": "Price must be a non-negative amount with up to two decimals"}, status=400)
+            if menu_item_id in submitted_prices and submitted_prices[menu_item_id] != unit_price:
+                return JsonResponse({"error": "A menu item cannot have multiple prices in one ticket"}, status=400)
+            submitted_prices[menu_item_id] = unit_price
+        quantities[menu_item_id] = quantities.get(menu_item_id, 0) + quantity
 
-            if not orders:
-                return JsonResponse({"error": "No menu items selected"}, status=400)
+    menu_items = MenuItem.objects.filter(
+        id__in=quantities,
+        is_available=True,
+    )
+    menu_items_by_id = {item.id: item for item in menu_items}
+    if len(menu_items_by_id) != len(quantities):
+        return JsonResponse(
+            {"error": "One or more selected items are unavailable"},
+            status=400,
+        )
+    unit_prices = {
+        item_id: submitted_prices.get(item_id, menu_item.price)
+        for item_id, menu_item in menu_items_by_id.items()
+    }
 
-            # Fetch the order transaction
+    customer_name = data.get("customer_name") or "Counter Customer"
+    served_by = data.get("served_by") or request.user.get_full_name() or request.user.username
+    if not isinstance(customer_name, str) or not isinstance(served_by, str):
+        return JsonResponse({"error": "Customer and staff names must be text"}, status=400)
+    customer_name = customer_name.strip()
+    served_by = served_by.strip()
+    if len(customer_name) > 255 or len(served_by) > 255:
+        return JsonResponse({"error": "Customer and staff names must be 255 characters or fewer"}, status=400)
+
+    table = None
+    table_id = data.get("table_id")
+    if table_id:
+        try:
+            table = Table.objects.select_related("dining_area").get(pk=int(table_id))
+        except (TypeError, ValueError, Table.DoesNotExist):
+            return JsonResponse({"error": "Selected table was not found"}, status=400)
+
+    with transaction.atomic():
+        order_id = data.get("random_id")
+        if order_id:
+            if not isinstance(order_id, str):
+                return JsonResponse({"error": "Invalid transaction"}, status=400)
             try:
                 order_transaction = OrderTransaction.objects.get(
-                    random_id=order_id)
+                    random_id=order_id,
+                    payment_mode="NO PAYMENT",
+                )
             except OrderTransaction.DoesNotExist:
-                return JsonResponse({"error": "Order transaction not found"}, status=404)
+                return JsonResponse({"error": "Selected transaction was not found"}, status=404)
+        else:
+            order_transaction = OrderTransaction.objects.create(
+                customer_name=customer_name,
+                served_by=served_by or None,
+                table=table,
+                dining_area=table.dining_area if table else None,
+                created_by=request.user,
+            )
 
-            # Create multiple order items
-            for order in orders:
-                try:
-                    menu_item = MenuItem.objects.get(id=order["menu_item_id"])
-                    OrderItem.objects.create(
-                        order=order_transaction,
-                        menu_item=menu_item,
-                        customer_name=customer_name,
-                        quantity=order["quantity"],
-                        status=status,
-                        special_notes=special_notes,
-                        order_type=order_type
-                    )
-                except MenuItem.DoesNotExist:
-                    return JsonResponse({"error": f"Menu item with ID {order['menu_item_id']} not found"}, status=404)
+        for menu_item_id, quantity in quantities.items():
+            OrderItem.objects.create(
+                order=order_transaction,
+                menu_item=menu_items_by_id[menu_item_id],
+                unit_price=unit_prices[menu_item_id],
+                customer_name=order_transaction.customer_name,
+                table=order_transaction.table,
+                dining_area=order_transaction.dining_area,
+                quantity=quantity,
+                status="Pending",
+                special_notes=special_notes,
+                order_type=order_type,
+            )
 
-            # Return JSON response with redirect URL
-            return JsonResponse({"message": "Orders placed successfully!", "redirect_url": "/manager/orders_transactions/"})
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON format"}, status=400)
-
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+    return JsonResponse({
+        "message": "Order sent to the kitchen",
+        "random_id": order_transaction.random_id,
+        "redirect_url": "/manager/orders_transactions/",
+    }, status=201)
 
 
 # === ORDER MANAGEMENT ===
@@ -411,6 +494,3 @@ def update_order_status(request, order_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-
-
-

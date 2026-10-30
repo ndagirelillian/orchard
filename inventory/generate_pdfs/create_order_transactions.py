@@ -104,7 +104,7 @@ def print_order_receipt(request, order_id):
 
         # Draw other columns
         p.drawString(25 * mm, y + 4 * mm, str(item.quantity))  # Align with the first line of the name
-        p.drawString(32 * mm, y + 4 * mm, f"{item.menu_item.price}")
+        p.drawString(32 * mm, y + 4 * mm, f"{item.unit_price}")
         p.drawRightString(57 * mm, y + 4 * mm, f"{item_total}")
 
         # Draw the horizontal line
@@ -135,4 +135,3 @@ def print_order_receipt(request, order_id):
     # Return PDF as response
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename=f"receipt_{order.random_id}.pdf")
-

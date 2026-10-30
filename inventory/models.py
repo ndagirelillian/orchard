@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import random
 from django.utils.timezone import now
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
 def generate_random_id():
     return str(random.randint(100000, 999999))
@@ -125,6 +125,7 @@ class OrderItem(models.Model):
     customer_name = models.CharField(max_length=255, blank=True, null=True, default="Customer")
     dining_area = models.ForeignKey('DiningArea', on_delete=models.SET_NULL, null=True, blank=True)
     table = models.ForeignKey('Table', on_delete=models.SET_NULL, null=True, blank=True)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     quantity = models.IntegerField(blank=True, null=True)
     status = models.CharField(
@@ -147,20 +148,18 @@ class OrderItem(models.Model):
     updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.menu_item and self.quantity:
-            try:
-                price = Decimal(self.menu_item.price or 0)
-            except (InvalidOperation, TypeError):
-                price = Decimal('0.00')
+        if self.unit_price is None and self.menu_item:
+            self.unit_price = Decimal(self.menu_item.price or 0)
 
+        if self.menu_item and self.quantity:
             try:
                 quantity = int(self.quantity or 0)
             except (ValueError, TypeError):
                 quantity = 0
 
-            self.total_price = price * quantity
+            self.total_price = (self.unit_price or Decimal('0.00')) * quantity
         else:
-            self.total_price = Decimal('0.00')  # Fix here
+            self.total_price = Decimal('0.00')
 
         super().save(*args, **kwargs)
 

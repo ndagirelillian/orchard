@@ -78,6 +78,18 @@ class RoomReservationForm(forms.ModelForm):
             'placeholder': 'Enter your government-issued ID'
         })
     )
+    booked_price_per_night = forms.DecimalField(
+        label="Nightly rate (UGX)",
+        max_digits=10,
+        decimal_places=2,
+        min_value=0,
+        required=False,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'min': '0',
+            'step': '0.01'
+        })
+    )
 
     class Meta:
         model = RoomReservation
@@ -89,6 +101,7 @@ class RoomReservationForm(forms.ModelForm):
             'NIN',
             'check_in_date', 
             'check_out_date', 
+            'booked_price_per_night',
             'special_requests'
         ]
         widgets = {
@@ -123,7 +136,8 @@ class RoomReservationForm(forms.ModelForm):
             'room': 'Select Room',
             'customer': 'Full Name',
             'check_in_date': 'Check-in Date',
-            'check_out_date': 'Check-out Date'
+            'check_out_date': 'Check-out Date',
+            'booked_price_per_night': 'Nightly rate (UGX)'
         }
         help_texts = {
             'NIN': 'Government-issued identification number',

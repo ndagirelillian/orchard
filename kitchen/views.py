@@ -4,18 +4,31 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from datetime import date
-from django.core.paginator import Paginator
+from django.db.models import Prefetch
 
 
 def kitchen(request):
-    """
-    Displays all order items for the kitchen view.
-    """
-    orders = OrderItem.objects.exclude(status='Served').order_by('-order_date')
-    paginator = Paginator(orders, 5)
-    page_number = request.GET.get('page')
-    orders = paginator.get_page(page_number)
-    return render(request, "kitchen.html", {"orders": orders})
+    active_statuses = ("Pending", "Preparing", "Cooked")
+    tickets = (
+        OrderTransaction.objects
+        .filter(order_items__status__in=active_statuses)
+        .distinct()
+        .prefetch_related(
+            Prefetch(
+                "order_items",
+                queryset=OrderItem.objects.filter(
+                    status__in=active_statuses,
+                ).select_related("menu_item").order_by("id"),
+                to_attr="kitchen_items",
+            )
+        )
+        .order_by("created", "id")
+    )
+    template = "kitchen/_tickets.html" if request.GET.get("partial") == "1" else "kitchen.html"
+    return render(request, template, {
+        "tickets": tickets,
+        "status_choices": OrderItem._meta.get_field("status").choices,
+    })
 
 
 @require_POST

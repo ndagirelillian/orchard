@@ -100,7 +100,7 @@
                     <tr>
                       <td>#{{ reservation.room.room_number }}</td>
                       <td>{{ reservation.room.room_type|default:"Standard" }}</td>
-                      <td class="text-end">{{ reservation.room.price_per_night|default:"Ush 0.00" }}</td>
+                      <td class="text-end">{{ reservation.booked_price_per_night|default:"Ush 0.00" }}</td>
                       <td class="text-center">{{ reservation.total_nights }}</td>
                       <td class="text-end fw-bold">{{ reservation.total_price|default:"Ush 0.00" }}</td>
                     </tr>

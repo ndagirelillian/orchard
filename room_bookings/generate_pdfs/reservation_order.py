@@ -64,14 +64,16 @@ def print_reservation(request, id):
     p.setFont("Helvetica-Bold", 9)
     p.drawString(5 * mm, y, "Room")
     p.drawString(25 * mm, y, "Nights")
-    p.drawString(40 * mm, y, "Price")
+    p.drawString(40 * mm, y, "Rate")
     y -= 6 * mm
 
     # Items in the order
     p.setFont("Helvetica", 9)
     p.drawString(5 * mm, y, f"{reservation_order.room.room_number }")
     p.drawString(25 * mm, y, f"{reservation_order.total_nights}")
-    p.drawString(40 * mm, y, f"{reservation_order.total_price:.2f}")
+    p.drawString(40 * mm, y, f"{reservation_order.booked_price_per_night:.2f}")
+    y -= 6 * mm
+    p.drawString(5 * mm, y, f"Total: {reservation_order.total_price:.2f}")
     y -= 6 * mm
 
     # Special Notes

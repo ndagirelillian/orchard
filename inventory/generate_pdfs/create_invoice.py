@@ -64,7 +64,7 @@ def print_order_invoice(request, order_id):
         item_total = item.total_price
         p.drawString(2 * mm, y, item.menu_item.name[:25])
         p.drawString(20 * mm, y, str(item.quantity))
-        p.drawString(27 * mm, y, f"{item.menu_item.price}")
+        p.drawString(27 * mm, y, f"{item.unit_price}")
         p.drawRightString(47 * mm, y, f"{item_total}")
         y -= 5 * mm
 
